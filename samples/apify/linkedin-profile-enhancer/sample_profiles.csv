@@ -1,0 +1,6 @@
+firstname,lastname,email,emailDomain,author,postLinkedinUrl,profileUrl,companyWebsite,companyLinkedinUrl
+John,Smith,john.smith@example.com,example.com,Alice Johnson,https://www.linkedin.com/feed/update/urn:li:activity:1234567890,https://www.linkedin.com/in/johnsmith,www.example.com,https://www.linkedin.com/company/example-inc
+Jane,Doe,jane.doe@techcorp.com,techcorp.com,Bob Wilson,https://www.linkedin.com/feed/update/urn:li:activity:1234567891,https://www.linkedin.com/in/janedoe,www.techcorp.com,https://www.linkedin.com/company/tech-corporation
+Michael,Brown,michael.b@innovate.io,innovate.io,Carol Davis,https://www.linkedin.com/feed/update/urn:li:activity:1234567892,https://www.linkedin.com/in/michaelbrown,www.innovate.io,https://www.linkedin.com/company/innovate-io
+Sarah,Wilson,sarah.wilson@startup.co,startup.co,David Miller,https://www.linkedin.com/feed/update/urn:li:activity:1234567893,https://www.linkedin.com/in/sarahwilson,www.startup.co,https://www.linkedin.com/company/startup-co
+Robert,Garcia,robert.garcia@corp.biz,corp.biz,Emma Moore,https://www.linkedin.com/feed/update/urn:li:activity:1234567894,https://www.linkedin.com/in/robertgarcia,www.corp.biz,https://www.linkedin.com/company/corporation-biz

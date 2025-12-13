@@ -1,0 +1,46 @@
+{
+  "name": "koldify-toolkit-electron",
+  "version": "2.0.0",
+  "description": "Koldify Toolkit – Apify + Blitz Automation Desktop App",
+  "main": "main.js",
+  "author": "Koldify",
+  "license": "ISC",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "apify-client": "^2.13.0",
+    "csv-parse": "^5.5.3",
+    "csv-parser": "^3.0.0",
+    "csv-stringify": "^6.4.6",
+    "csv-writer": "^1.6.0",
+    "fast-glob": "^3.3.3",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.koldify.toolkit",
+    "productName": "Koldify Toolkit",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "backend/**/*",
+      "renderer/**/*",
+      "samples/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "renderer/assets/koldify-logo.ico"
+    }
+  }
+}

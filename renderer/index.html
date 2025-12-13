@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koldify.io Tools | LinkedIn & Blitz Data Suite</title>
+  <meta name="description" content="Powerful automation tools for LinkedIn data extraction and Blitz API enrichment." />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">K</div>
+      <div class="header-text">
+        <h1>Koldify.io Tools</h1>
+        <p>LinkedIn & Blitz Data Suite</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="section-toggle">
+      <button class="toggle-btn active" data-section="apify">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        Apify
+      </button>
+      <button class="toggle-btn" data-section="blitz">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Blitz
+      </button>
+      <!-- 🔁 Reset App button -->
+      <button id="reset-app" class="btn-ghost small">
+        Reset App
+      </button>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Apify Sidebar -->
+      <aside class="sidebar" id="apify-sidebar">
+        <nav class="sidebar-nav">
+          <button class="nav-tab active" data-tool="post-finder">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            Post Finder
+          </button>
+          <button class="nav-tab" data-tool="reaction-scraper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Reaction Scraper
+          </button>
+          <button class="nav-tab" data-tool="merge-split">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+            </svg>
+            Merge / Split CSV
+          </button>
+          <button class="nav-tab" data-tool="lead-merger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+            </svg>
+            Lead Merger
+          </button>
+          <button class="nav-tab" data-tool="comment-scraper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Comment Scraper
+          </button>
+          <button class="nav-tab" data-tool="apify-email-enricher">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            Email Enricher
+          </button>
+          <button class="nav-tab" data-tool="linkedin-profile-enhancer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 11a4 4 0 0 0-4-4h-2.5a4 4 0 0 0-4 4v6h10.5V11z"/>
+            </svg>
+            LinkedIn Profile Enhancer
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Blitz Sidebar -->
+      <aside class="sidebar hidden" id="blitz-sidebar">
+        <nav class="sidebar-nav">
+          <button class="nav-tab active" data-tool="email-enricher">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            Email Enricher
+          </button>
+          <button class="nav-tab" data-tool="waterfall-icp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+            Waterfall ICP
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Tool Cards Container -->
+      <div class="tool-container">
+        
+        <!-- APIFY TOOLS -->
+        
+        <!-- Post Finder -->
+        <div class="tool-card" id="post-finder" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Post Finder</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Find LinkedIn posts by keyword using rotating keys and export to CSV.">?</button>
+              </div>
+              <p>Search LinkedIn for posts by keyword and export results to CSV</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Keyword / Name</label>
+                <input type="text" class="input-field" placeholder="e.g. marketing, sales">
+              </div>
+              <div class="form-field">
+                <label>Per-key limit</label>
+                <input type="number" class="input-field" value="100">
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+                <span class="hint">JSON file with Apify API tokens</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="post-finder-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="post-finder-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="post-finder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+                Run Post Finder
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-post-finder"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total Keys:</span>
+                <strong data-metric="post-finder-total-keys">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Posts Found:</span>
+                <strong data-metric="post-finder-posts-found">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="post-finder"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-post-finder">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reaction Scraper -->
+        <div class="tool-card hidden" id="reaction-scraper" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Reaction Scraper</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Scrape LinkedIn post reactions, rotate keys, and export unique reactors.">?</button>
+              </div>
+              <p>Scrape LinkedIn post reactions and export unique reactors</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV (posts.csv)</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">CSV file with post URLs</span>
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+              </div>
+              <div class="form-field">
+                <label>Per-key limit</label>
+                <input type="number" class="input-field" value="2500">
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="reaction-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="reaction-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="reaction-scraper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                </svg>
+                Run Reaction Scraper
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-post-reaction"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Posts Processed:</span>
+                <strong data-metric="reaction-posts-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Unique Reactors:</span>
+                <strong data-metric="reaction-unique-reactors">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="reaction-scraper"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-reaction-scraper">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Merge / Split CSV -->
+        <div class="tool-card hidden" id="merge-split" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Merge / Split CSV</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Merge CSVs, dedupe, and optionally split into sized chunks for processing.">?</button>
+              </div>
+              <p>Combine multiple CSVs and split into manageable chunks</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input folder</label>
+                <div class="input-with-button">
+                  <input id="merge-input-dir" type="text" class="input-field" placeholder="./input">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="merge-input-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Folder containing CSV files</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="merge-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="merge-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Max rows per chunk</label>
+                <input type="number" class="input-field" value="5000">
+              </div>
+              <div class="form-field">
+                <label>Mode</label>
+                <select class="input-field">
+                  <option value="merge-split">Merge + Split</option>
+                  <option value="merge-only">Merge only</option>
+                  <option value="split-only">Split only</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="merge-split">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+                </svg>
+                Run Merge / Split
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-combined-merge-split"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Files Found:</span>
+                <strong data-metric="merge-files-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Chunks Created:</span>
+                <strong data-metric="merge-chunks-created">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="merge-split"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-merge-split">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lead Merger -->
+        <div class="tool-card hidden" id="lead-merger" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Lead Merger</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Merge lead CSVs, dedupe by email, and normalize headers into one clean file.">?</button>
+              </div>
+              <p>Merge multiple lead CSV files with deduplication and normalization</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input leads CSV folder</label>
+                <div class="input-with-button">
+                  <input id="lead-input-dir" type="text" class="input-field" placeholder="./leads">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="lead-input-dir"
+                  >Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="lead-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="lead-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+            </div>
+            <div class="checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" checked>
+                <span>Remove duplicates by email</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked>
+                <span>Normalize headers</span>
+              </label>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="lead-merger">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                </svg>
+                Run Lead Merger
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-csv-lead-merger"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Files Merged:</span>
+                <strong data-metric="lead-files-merged">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Total Leads:</span>
+                <strong data-metric="lead-total-leads">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Duplicates Removed:</span>
+                <strong data-metric="lead-duplicates-removed">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="lead-merger"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-lead-merger">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comment Scraper -->
+        <div class="tool-card hidden" id="comment-scraper" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>LinkedIn Comment Scraper (Orchestrator)</h3>
+                <span class="badge badge-apify">Apify Actor</span>
+                <button class="help-icon" type="button" title="Distribute comment scraping across multiple Apify keys and save one CSV per post.">?</button>
+              </div>
+              <p>Distributes comment scraping across multiple Apify keys and outputs one CSV per post</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Posts CSV file(s)</label>
+                <input type="file" accept=".csv" multiple class="input-field file-input">
+                <span class="hint">Each file must contain columns: 'post url', 'author name', 'comment num', 'status'</span>
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+                <span class="hint">Contains Apify tokens. Key usage is tracked in used_keys.json</span>
+              </div>
+              <div class="form-field">
+                <label>Limit per key</label>
+                <input type="number" class="input-field" value="2500">
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="comment-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="comment-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+            </div>
+            <div class="info-box">
+              <span>Actor ID:</span> <code>ZI6ykbLlGS3APaPE8</code>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="comment-scraper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Run Comment Scraper
+              </button>
+              <button class="btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+                </svg>
+                Reset Key Usage
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-comment-orchestrator"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill"><span>Total Posts:</span> <strong data-metric="comment-total-posts">0</strong></div>
+              <div class="status-pill"><span>Processed Posts:</span> <strong data-metric="comment-processed-posts">0</strong></div>
+              <div class="status-pill"><span>Active Keys:</span> <strong data-metric="comment-active-keys">0</strong></div>
+              <div class="status-pill"><span>Keys Banned:</span> <strong data-metric="comment-keys-banned">0</strong></div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="comment-scraper"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-comment-scraper">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Apify Email Enricher -->
+        <div class="tool-card hidden" id="apify-email-enricher" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Email Enricher (Apify)</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Enrich LinkedIn profiles via Apify actor/flow and append emails to CSVs.">?</button>
+              </div>
+              <p>Enrich LinkedIn profiles using Apify actors (separate from Blitz email API)</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input folder (Apify CSV output)</label>
+                <div class="input-with-button">
+                  <input id="apify-email-input-dir" type="text" class="input-field" placeholder="./apify_output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="apify-email-input-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Select Apify output CSVs. Required column: "linkedin url" (case-insensitive). Optional: "post url", "author name".</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="apify-email-output-dir" type="text" class="input-field" placeholder="./apify_email_output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="apify-email-output-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Where enriched CSVs will be written</span>
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+                <span class="hint">Used to call Apify actors for enrichment</span>
+              </div>
+              <div class="form-field">
+                <label>Actor ID / Flow ID</label>
+                <input type="text" class="input-field" placeholder="e.g., abc123xyz" value="GOvL4O4RwFqsdIqXF">
+                <span class="hint">Default: GOvL4O4RwFqsdIqXF (can be changed if needed)</span>
+              </div>
+              <div class="form-field">
+                <label>CSV Size</label>
+                <input type="number" class="input-field" value="100">
+                <span class="hint">Expected rows per CSV (for quota math)</span>
+              </div>
+              <div class="form-field">
+                <label>CSVs per Key</label>
+                <input type="number" class="input-field" value="10">
+                <span class="hint">How many CSVs each API key can process</span>
+              </div>
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input type="number" class="input-field" value="5">
+                <span class="hint">Number of parallel workers (1-8 recommended)</span>
+              </div>
+            </div>
+            <div class="checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox">
+                <span>Overwrite existing output</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked>
+                <span>Append to existing</span>
+              </label>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="apify-email-enricher">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                Run Apify Email Enricher
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="apify-email-extractor"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Files Processed:</span>
+                <strong data-metric="apify-email-files-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Remaining Quota:</span>
+                <strong data-metric="apify-email-rows-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>API Keys Loaded:</span>
+                <strong data-metric="apify-email-enriched-rows">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="apify-email-enricher"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-apify-email-enricher">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn Profile Enhancer -->
+        <div class="tool-card hidden" id="linkedin-profile-enhancer" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 11a4 4 0 0 0-4-4h-2.5a4 4 0 0 0-4 4v6h10.5V11z"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>LinkedIn Profile Enhancer</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Enrich LinkedIn profiles with professional information, company details, and contact data using Apify actor.">?</button>
+              </div>
+              <p>Extract and enrich LinkedIn profile data including headline, positions, and company information</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">CSV with LinkedIn profile URLs (column: "profileUrl" or "profile url")</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="linkedin-profile-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="linkedin-profile-output-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Where enriched profiles CSV will be written</span>
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+                <span class="hint">JSON file with Apify API tokens</span>
+              </div>
+              <div class="form-field">
+                <label>Batch size</label>
+                <input type="number" class="input-field" value="10" min="1" max="50">
+                <span class="hint">How many profiles per batch (1-50)</span>
+              </div>
+              <div class="form-field">
+                <label>Max credits per key</label>
+                <input type="number" class="input-field" value="1600" min="100">
+                <span class="hint">Credit limit per API key</span>
+              </div>
+              <div class="form-field">
+                <label>Actor ID</label>
+                <input type="text" class="input-field" placeholder="yZnhB5JewWf9xSmoM" value="yZnhB5JewWf9xSmoM">
+                <span class="hint">Apify LinkedIn Profile Scraper actor ID</span>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="linkedin-profile-enhancer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 11a4 4 0 0 0-4-4h-2.5a4 4 0 0 0-4 4v6h10.5V11z"/>
+                </svg>
+                Run Profile Enricher
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="linkedin-profile-enhancer"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Profiles Processed:</span>
+                <strong data-metric="linkedin-profile-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Valid Profiles:</span>
+                <strong data-metric="linkedin-profile-valid">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Keys Active:</span>
+                <strong data-metric="linkedin-profile-keys-active">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="linkedin-profile-enhancer"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-linkedin-profile-enhancer">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLITZ TOOLS -->
+
+        <!-- Email Enricher -->
+        <div class="tool-card hidden" id="email-enricher" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Blitz Email Enricher</h3>
+                <span class="badge badge-blitz">Blitz</span>
+                <button class="help-icon" type="button" title="Send LinkedIn profiles to Blitz API to fetch verified work emails into one CSV.">?</button>
+              </div>
+              <p>Takes LinkedIn profiles and returns verified work emails into a combined CSV</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input id="blitz-email-api-key" type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
+              </div>
+              <div class="form-field">
+                <label>Input folder (CSV files)</label>
+                <div class="input-with-button">
+                  <input id="blitz-email-input-dir" type="text" class="input-field" placeholder="./input">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="blitz-email-input-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Each CSV must contain columns like 'Person Linkedin Url', 'Job Title', etc.</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="blitz-email-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="blitz-email-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Combined output filename</label>
+                <input id="blitz-email-output-filename" type="text" class="input-field" placeholder="enriched_output.csv" value="enriched_output.csv">
+                <span class="hint">Name of the combined CSV file (will be created in output folder)</span>
+              </div>
+              <div class="form-field">
+                <div class="info-box">Rate limit: 5 requests/sec (~18k leads/hour)</div>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="email-enricher">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                Run Email Enrichment
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-email-enricher"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Rows Processed:</span>
+                <strong data-metric="blitz-email-rows-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Emails Found:</span>
+                <strong data-metric="blitz-email-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Emails Not Found:</span>
+                <strong data-metric="blitz-email-not-found">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="email-enricher"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-email-enricher">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waterfall ICP -->
+        <div class="tool-card hidden" id="waterfall-icp" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Blitz Waterfall ICP</h3>
+                <span class="badge badge-blitz">Blitz</span>
+                <button class="help-icon" type="button" title="Use Blitz Waterfall search to find ICP-fit contacts from company LinkedIn URLs with include/exclude filters.">?</button>
+              </div>
+              <p>Find ICP-fit contacts from company LinkedIn URLs using Blitz Waterfall search</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
+              </div>
+              <div class="form-field">
+                <label>Companies CSV</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">Must contain column 'company_linkedin_url'</span>
+              </div>
+              <div class="form-field">
+                <label>Include titles CSV</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">First non-empty column per row is used (e.g., ceo, founder)</span>
+              </div>
+              <div class="form-field">
+                <label>Exclude titles CSV (optional)</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">Filter out unwanted roles (intern, assistant, etc.)</span>
+              </div>
+              <div class="form-field">
+                <label>Locations CSV (optional)</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">2-letter country codes (US, UK, DE, …)</span>
+              </div>
+              <div class="form-field">
+                <label>Max results per company</label>
+                <input type="number" class="input-field" value="10">
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="waterfall-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="waterfall-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output CSV file</label>
+                <input type="text" class="input-field" placeholder="blitz_icp_results.csv">
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="waterfall-icp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                </svg>
+                Run Waterfall ICP
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-waterfall-icp"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Companies Processed:</span>
+                <strong data-metric="waterfall-companies-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Contacts Found:</span>
+                <strong data-metric="waterfall-contacts-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>No Matches:</span>
+                <strong data-metric="waterfall-no-matches">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="waterfall-icp"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-waterfall-icp">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

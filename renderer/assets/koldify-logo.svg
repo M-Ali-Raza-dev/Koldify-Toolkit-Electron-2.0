@@ -1,0 +1,33 @@
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Outer Glow -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5cf4ff"/>
+      <stop offset="50%" stop-color="#12d1ff"/>
+      <stop offset="100%" stop-color="#00aaff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Radial Glow Behind K -->
+  <circle cx="55" cy="55" r="42" fill="#00caff" opacity="0.25" filter="url(#glow)" />
+
+  <!-- K Letter -->
+  <path
+    d="M38 20 L38 90 M38 55 L75 20 M38 55 L75 90"
+    stroke="url(#grad)"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+
+</svg>
