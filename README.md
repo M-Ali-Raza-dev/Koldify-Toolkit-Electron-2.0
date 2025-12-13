@@ -1,8 +1,4 @@
-Here’s a **good-looking, “GitHub-ready” README.md** you can copy-paste (it matches your repo structure + tools in `main.js` + UI in `renderer/index.html`).
 
----
-
-````md
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
   <h1>Koldify Toolkit (Electron) — v2.0</h1>
