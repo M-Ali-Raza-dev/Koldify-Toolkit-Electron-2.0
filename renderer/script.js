@@ -91,7 +91,7 @@
   // ---------- METRICS ----------
   function updateMetrics(toolId, metrics = {}) {
     if (!toolId || !metrics) return;
-    
+
     console.log('[DEBUG] updateMetrics called:', { toolId, metrics });
 
     const set = (dataMetricName, value) => {
@@ -136,7 +136,10 @@
 
       case 'apify-email-enricher':
         set('apify-email-files-processed', metrics.filesProcessed || 0);
-        set('apify-email-rows-processed', metrics.remainingQuota !== undefined ? metrics.remainingQuota : 0);
+        set(
+          'apify-email-rows-processed',
+          metrics.remainingQuota !== undefined ? metrics.remainingQuota : 0
+        );
         set('apify-email-enriched-rows', metrics.apiKeysLoaded || 0);
         break;
 
@@ -145,6 +148,13 @@
         set('linkedin-profile-valid', metrics.validProfiles || 0);
         set('linkedin-profile-keys-active', metrics.keysActive || 0);
         break;
+
+      case 'contact-details-scraper': {
+        set('contact-total-keys', metrics.totalKeys);
+        set('contact-chunks-processed', metrics.chunksProcessed);
+        set('contact-urls-total', metrics.urlsTotal);
+        break;
+      }
 
       // BLITZ
       case 'email-enricher':
@@ -187,16 +197,12 @@
       const activeTab =
         apifySidebar.querySelector('.nav-tab.active') ||
         apifySidebar.querySelector('.nav-tab[data-tool]');
-      activeToolId = activeTab
-        ? activeTab.getAttribute('data-tool')
-        : 'post-finder';
+      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'post-finder';
     } else if (section === 'blitz' && blitzSidebar) {
       const activeTab =
         blitzSidebar.querySelector('.nav-tab.active') ||
         blitzSidebar.querySelector('.nav-tab[data-tool]');
-      activeToolId = activeTab
-        ? activeTab.getAttribute('data-tool')
-        : 'email-enricher';
+      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'email-enricher';
     }
 
     toolCards.forEach((card) => {
@@ -234,8 +240,7 @@
         const section =
           tab.closest('.sidebar')?.id === 'blitz-sidebar' ? 'blitz' : 'apify';
 
-        const siblingTabs =
-          tab.closest('.sidebar')?.querySelectorAll('.nav-tab') || [];
+        const siblingTabs = tab.closest('.sidebar')?.querySelectorAll('.nav-tab') || [];
         siblingTabs.forEach((t) => t.classList.remove('active'));
         tab.classList.add('active');
 
@@ -259,9 +264,7 @@
           if (!selectedPath) return;
 
           const input = document.getElementById(targetId);
-          if (input) {
-            input.value = selectedPath;
-          }
+          if (input) input.value = selectedPath;
         } catch (err) {
           console.error('Failed to open folder picker:', err);
         }
@@ -300,6 +303,14 @@
 
     const inputs = card.querySelectorAll('.form-field .input-field');
 
+    // helper for Contact Details Scraper: only apply dept filter when Lead enrichment output is involved
+    const isLeadEnrichmentOutput = (choice) => {
+      // 3 = Lead enrichment only
+      // 4 = Lead + Social
+      // 5 = All outputs
+      return choice === '3' || choice === '4' || choice === '5';
+    };
+
     switch (toolId) {
       // -------- APIFY --------
       case 'post-finder': {
@@ -312,17 +323,89 @@
         const perKeyLimit = Number(perKeyInput?.value || 0) || 0;
 
         let keysFilePath = '';
-        if (keysFileInput && keysFileInput.files && keysFileInput.files[0]) {
-          keysFilePath = keysFileInput.files[0].path || '';
-        }
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
 
         const outputDir = outputDirInput?.value?.trim() || '';
 
+        return { keyword, perKeyLimit, keysFilePath, outputDir };
+      }
+
+      case 'contact-details-scraper': {
+        const inputCsvInput = inputs[0];
+        const keysFileInput = inputs[1];
+        const urlColInput = inputs[2];
+        const batchSizeInput = inputs[3];
+        const outputDirInput = inputs[4];
+        const outputChoiceSelect = inputs[5];
+
+        let inputCsvPath = '';
+        if (inputCsvInput?.files?.[0]) inputCsvPath = inputCsvInput.files[0].path || '';
+
+        let keysFilePath = '';
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
+
+        const urlCol = urlColInput?.value?.trim() || '';
+        const batchSize = Number(batchSizeInput?.value || 100) || 100;
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputChoice = outputChoiceSelect?.value || '5';
+
+        // Departments multi-select state from embedded UI (no enable toggle)
+        let selectedDepartments = [];
+        const chipsWrap = document.getElementById('chips-contact');
+        if (chipsWrap) {
+          const chipLabels = chipsWrap.querySelectorAll('span[title]');
+          chipLabels.forEach((el) => selectedDepartments.push(el.getAttribute('title')));
+        }
+
+        // ✅ If no departments selected → treat as none.
+        // Only include when outputChoice includes Lead enrichment and selection is non-empty.
+        const shouldIncludeDepartments =
+          isLeadEnrichmentOutput(outputChoice) &&
+          selectedDepartments.length > 0;
+
+        const leadDepartmentsChoice = shouldIncludeDepartments
+          ? { type: 'selected', selectedDepartments }
+          : { type: 'none' };
+
+        // Social toggles
+        const scrapeSocialMediaProfiles = {
+          facebooks: !!document.getElementById('contact-social-fb')?.checked,
+          instagrams: !!document.getElementById('contact-social-ig')?.checked,
+          youtubes: !!document.getElementById('contact-social-yt')?.checked,
+          tiktoks: !!document.getElementById('contact-social-tt')?.checked,
+          twitters: !!document.getElementById('contact-social-tw')?.checked,
+        };
+
+        // Proxy config
+        const proxyConfig = {
+          useApifyProxy: !!document.getElementById('contact-proxy-enable')?.checked,
+          groups: (document.getElementById('contact-proxy-groups')?.value || '').trim(),
+          country: (document.getElementById('contact-proxy-country')?.value || '').trim(),
+        };
+
+        if (!inputCsvPath) {
+          alert('Please select an input CSV file');
+          return null;
+        }
+        if (!keysFilePath) {
+          alert('Please upload keys.json file');
+          return null;
+        }
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
         return {
-          keyword,
-          perKeyLimit,
-          keysFilePath,
+          inputCsvPath,
+          keysPath: keysFilePath,
+          urlCol: urlCol || null,
+          batchSize,
           outputDir,
+          outputChoice,
+          leadDepartmentsChoice, // ✅ will be {type:'none'} unless lead enrichment + enabled + not NONE
+          scrapeSocialMediaProfiles,
+          proxyConfig,
         };
       }
 
@@ -333,26 +416,19 @@
         const outputDirInput = inputs[3];
 
         const postsCsvPaths = [];
-        if (postsFileInput && postsFileInput.files) {
+        if (postsFileInput?.files) {
           for (const f of postsFileInput.files) {
-            if (f && f.path) postsCsvPaths.push(f.path);
+            if (f?.path) postsCsvPaths.push(f.path);
           }
         }
 
         let keysFilePath = '';
-        if (keysFileInput && keysFileInput.files && keysFileInput.files[0]) {
-          keysFilePath = keysFileInput.files[0].path || '';
-        }
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
 
         const perKeyLimit = Number(perKeyInput?.value || 0) || 0;
         const outputDir = outputDirInput?.value?.trim() || '';
 
-        return {
-          postsCsvPaths,
-          keysFilePath,
-          perKeyLimit,
-          outputDir,
-        };
+        return { postsCsvPaths, keysFilePath, perKeyLimit, outputDir };
       }
 
       case 'merge-split': {
@@ -366,33 +442,21 @@
         const maxRowsPerChunk = Number(maxRowsInput?.value || 0) || 0;
         const mode = modeSelect?.value || 'merge-split';
 
-        return {
-          inputDir,
-          outputDir,
-          maxRowsPerChunk,
-          mode,
-        };
+        return { inputDir, outputDir, maxRowsPerChunk, mode };
       }
 
       case 'lead-merger': {
         const inputDirInput = inputs[0];
         const outputDirInput = inputs[1];
 
-        const checkboxes = card.querySelectorAll(
-          '.checkbox-row input[type="checkbox"]'
-        );
+        const checkboxes = card.querySelectorAll('.checkbox-row input[type="checkbox"]');
         const dedupeByEmail = !!checkboxes[0]?.checked;
         const normalizeHeaders = !!checkboxes[1]?.checked;
 
         const inputDir = inputDirInput?.value?.trim() || '';
         const outputDir = outputDirInput?.value?.trim() || '';
 
-        return {
-          inputDir,
-          outputDir,
-          dedupeByEmail,
-          normalizeHeaders,
-        };
+        return { inputDir, outputDir, dedupeByEmail, normalizeHeaders };
       }
 
       case 'comment-scraper': {
@@ -402,26 +466,19 @@
         const outputDirInput = inputs[3];
 
         const postsCsvPaths = [];
-        if (postsFileInput && postsFileInput.files) {
+        if (postsFileInput?.files) {
           for (const f of postsFileInput.files) {
-            if (f && f.path) postsCsvPaths.push(f.path);
+            if (f?.path) postsCsvPaths.push(f.path);
           }
         }
 
         let keysFilePath = '';
-        if (keysFileInput && keysFileInput.files && keysFileInput.files[0]) {
-          keysFilePath = keysFileInput.files[0].path || '';
-        }
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
 
         const limitPerKey = Number(limitInput?.value || 0) || 0;
         const outputDir = outputDirInput?.value?.trim() || '';
 
-        return {
-          postsCsvPaths,
-          keysFilePath,
-          limitPerKey,
-          outputDir,
-        };
+        return { postsCsvPaths, keysFilePath, limitPerKey, outputDir };
       }
 
       case 'apify-email-enricher': {
@@ -433,9 +490,7 @@
         const csvsPerKeyInput = inputs[5];
         const concurrencyInput = inputs[6];
 
-        const checkboxes = card.querySelectorAll(
-          '.checkbox-row input[type="checkbox"]'
-        );
+        const checkboxes = card.querySelectorAll('.checkbox-row input[type="checkbox"]');
         const overwrite = !!checkboxes[0]?.checked;
         const append = !!checkboxes[1]?.checked;
 
@@ -443,9 +498,7 @@
         const outputDir = outputDirInput?.value?.trim() || '';
 
         let keysFilePath = '';
-        if (keysFileInput && keysFileInput.files && keysFileInput.files[0]) {
-          keysFilePath = keysFileInput.files[0].path || '';
-        }
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
 
         const actorOrFlowId = actorIdInput?.value?.trim() || '';
         const csvSize = Number(csvSizeInput?.value || 100) || 100;
@@ -474,27 +527,20 @@
         const actorIdInput = inputs[5];
 
         let inputCsv = '';
-        if (inputCsvInput && inputCsvInput.files && inputCsvInput.files[0]) {
-          inputCsv = inputCsvInput.files[0].path || '';
-        }
+        if (inputCsvInput?.files?.[0]) inputCsv = inputCsvInput.files[0].path || '';
 
         const outputDir = outputDirInput?.value?.trim() || '';
-
         if (!inputCsv) {
           alert('Please select an input CSV file');
           return null;
         }
-
         if (!outputDir) {
           alert('Please select an output folder');
           return null;
         }
 
         let keysFilePath = '';
-        if (keysFileInput && keysFileInput.files && keysFileInput.files[0]) {
-          keysFilePath = keysFileInput.files[0].path || '';
-        }
-
+        if (keysFileInput?.files?.[0]) keysFilePath = keysFileInput.files[0].path || '';
         if (!keysFilePath) {
           alert('Please upload keys.json file');
           return null;
@@ -504,28 +550,25 @@
         const maxCredits = Number(maxCreditsInput?.value || 1600) || 1600;
         const actorId = actorIdInput?.value?.trim() || 'yZnhB5JewWf9xSmoM';
 
-        return {
-          inputCsv,
-          outputDir,
-          keysFilePath,
-          batchSize,
-          maxCredits,
-          actorId,
-        };
+        return { inputCsv, outputDir, keysFilePath, batchSize, maxCredits, actorId };
       }
 
       // -------- BLITZ --------
       case 'email-enricher': {
-        const apiKey = document.getElementById('blitz-email-api-key')?.value?.trim() || '';
-        const inputDir = document.getElementById('blitz-email-input-dir')?.value?.trim() || '';
-        const outputDir = document.getElementById('blitz-email-output-dir')?.value?.trim() || '';
-        const outputFileName = document.getElementById('blitz-email-output-filename')?.value?.trim() || 'enriched_output.csv';
+        const apiKey =
+          document.getElementById('blitz-email-api-key')?.value?.trim() || '';
+        const inputDir =
+          document.getElementById('blitz-email-input-dir')?.value?.trim() || '';
+        const outputDir =
+          document.getElementById('blitz-email-output-dir')?.value?.trim() || '';
+        const outputFileName =
+          document.getElementById('blitz-email-output-filename')?.value?.trim() ||
+          'enriched_output.csv';
 
         if (!inputDir) {
           alert('Please select an input folder');
           return null;
         }
-
         if (!outputDir) {
           alert('Please select an output folder');
           return null;
@@ -572,8 +615,7 @@
           locationsCsvPath = locationsInput.files[0].path || '';
         }
 
-        const maxResultsPerCompany =
-          Number(maxResultsInput?.value || 0) || 0;
+        const maxResultsPerCompany = Number(maxResultsInput?.value || 0) || 0;
         const outputDir = outputDirInput?.value?.trim() || '';
         const outputFile = outputFileInput?.value?.trim() || '';
 
@@ -629,49 +671,46 @@
 
       if (toolId === 'apify-email-enricher') {
         console.log('[DEBUG] Validating Apify Email Enricher...');
-        console.log('[DEBUG] inputDir:', payload.inputDir);
-        console.log('[DEBUG] outputDir:', payload.outputDir);
-        console.log('[DEBUG] keysFilePath:', payload.keysFilePath);
-        console.log('[DEBUG] actorOrFlowId:', payload.actorOrFlowId);
-        
-        if (!payload.inputDir) throw new Error('Input folder is required.');
-        if (!payload.outputDir) throw new Error('Output folder is required.');
-        if (!payload.keysFilePath) throw new Error('Keys file (keys.json) is required.');
-        if (!payload.actorOrFlowId) throw new Error('Actor ID / Flow ID is required.');
+        console.log('[DEBUG] inputDir:', payload?.inputDir);
+        console.log('[DEBUG] outputDir:', payload?.outputDir);
+        console.log('[DEBUG] keysFilePath:', payload?.keysFilePath);
+        console.log('[DEBUG] actorOrFlowId:', payload?.actorOrFlowId);
+
+        if (!payload?.inputDir) throw new Error('Input folder is required.');
+        if (!payload?.outputDir) throw new Error('Output folder is required.');
+        if (!payload?.keysFilePath)
+          throw new Error('Keys file (keys.json) is required.');
+        if (!payload?.actorOrFlowId)
+          throw new Error('Actor ID / Flow ID is required.');
         console.log('[DEBUG] All validations passed!');
       }
 
       if (toolId === 'linkedin-profile-enhancer') {
         console.log('[DEBUG] Validating LinkedIn Profile Enhancer...');
-        console.log('[DEBUG] inputCsv:', payload.inputCsv);
-        console.log('[DEBUG] outputDir:', payload.outputDir);
-        console.log('[DEBUG] keysFilePath:', payload.keysFilePath);
-        
-        if (!payload.inputCsv) throw new Error('Input CSV file is required.');
-        if (!payload.outputDir) throw new Error('Output folder is required.');
-        if (!payload.keysFilePath) throw new Error('Keys file (keys.json) is required.');
+        console.log('[DEBUG] inputCsv:', payload?.inputCsv);
+        console.log('[DEBUG] outputDir:', payload?.outputDir);
+        console.log('[DEBUG] keysFilePath:', payload?.keysFilePath);
+
+        if (!payload?.inputCsv) throw new Error('Input CSV file is required.');
+        if (!payload?.outputDir) throw new Error('Output folder is required.');
+        if (!payload?.keysFilePath)
+          throw new Error('Keys file (keys.json) is required.');
         console.log('[DEBUG] All validations passed!');
       }
 
       console.log('[DEBUG] Calling electronAPI.runTool with:', toolId, payload);
       const result = await electronAPI.runTool(toolId, payload);
       console.log('[DEBUG] Got result:', result);
-      const runId = result?.runId;
 
-      if (!runId) {
-        throw new Error('No runId returned from main process.');
-      }
+      const runId = result?.runId;
+      if (!runId) throw new Error('No runId returned from main process.');
 
       state.currentRunId = runId;
       state.currentToolId = toolId;
       appendLog(toolId, `✓ Tool "${toolId}" started (runId: ${runId})`);
     } catch (err) {
       console.error('[ERROR] startTool error:', err);
-      appendLog(
-        toolId,
-        `✗ Failed to start tool "${toolId}": ${err.message}`,
-        'error'
-      );
+      appendLog(toolId, `✗ Failed to start tool "${toolId}": ${err.message}`, 'error');
       resetState();
     }
   }
@@ -688,11 +727,7 @@
     }
 
     if (state.stopping) {
-      appendLog(
-        state.currentToolId,
-        'Already stopping current run…',
-        'warn'
-      );
+      appendLog(state.currentToolId, 'Already stopping current run…', 'warn');
       return;
     }
 
@@ -753,13 +788,11 @@
         return;
       }
 
-      const allTextInputs = document.querySelectorAll(
-        '.tool-card .input-field'
-      );
-      allTextInputs.forEach((inp) => {
-        if (inp.type === 'number') {
-          return;
-        }
+      // reset inputs
+      const allInputs = document.querySelectorAll('.tool-card .input-field');
+      allInputs.forEach((inp) => {
+        if (inp.type === 'number') return;
+
         if (inp.type === 'password') {
           inp.value = '';
           return;
@@ -768,15 +801,25 @@
           inp.value = '';
           return;
         }
+
         inp.value = inp.defaultValue || '';
       });
 
-      const allCheckboxes = document.querySelectorAll(
-        '.tool-card .checkbox-row input[type="checkbox"]'
-      );
+      // ✅ reset ALL checkboxes (not only .checkbox-row)
+      const allCheckboxes = document.querySelectorAll('.tool-card input[type="checkbox"]');
       allCheckboxes.forEach((cb) => {
         cb.checked = cb.defaultChecked;
       });
+
+      // ✅ reset contact departments selector UI (chips + toggle text)
+      const chipsWrap = document.getElementById('chips-contact');
+      if (chipsWrap) chipsWrap.innerHTML = '';
+
+      const countEl = document.getElementById('count-contact');
+      if (countEl) countEl.textContent = '0';
+
+      const toggleText = document.getElementById('toggleText-contact');
+      if (toggleText) toggleText.textContent = 'Off';
 
       const metricElements = document.querySelectorAll('[data-metric]');
       metricElements.forEach((el) => {
@@ -788,7 +831,7 @@
         const consoleEl = document.getElementById(`console-${toolId}`);
         if (consoleEl) {
           consoleEl.textContent = 'Waiting for execution...';
-          consoleEl.style.maxHeight = '4rem'; // reset to collapsed size
+          consoleEl.style.maxHeight = '4rem';
         }
       });
 
@@ -800,8 +843,7 @@
 
   // ---------- PER-TOOL CONSOLE TOGGLES ----------
   function initPerToolConsoleToggles() {
-    const consoleToggleButtons =
-      document.querySelectorAll('.console-toggle');
+    const consoleToggleButtons = document.querySelectorAll('.console-toggle');
 
     consoleToggleButtons.forEach((btn) => {
       const toolId = btn.getAttribute('data-tool-id');
@@ -810,7 +852,6 @@
       const consoleEl = document.getElementById(`console-${toolId}`);
       if (!consoleEl) return;
 
-      // start small
       consoleEl.style.maxHeight = '4rem';
       btn.dataset.expanded = 'false';
       btn.textContent = 'Expand Log';
@@ -819,12 +860,10 @@
         const isExpanded = btn.dataset.expanded === 'true';
 
         if (isExpanded) {
-          // shrink
           consoleEl.style.maxHeight = '4rem';
           btn.dataset.expanded = 'false';
           btn.textContent = 'Expand Log';
         } else {
-          // expand big
           consoleEl.style.maxHeight = '22rem';
           btn.dataset.expanded = 'true';
           btn.textContent = 'Shrink Log';
@@ -836,42 +875,25 @@
   // ---------- IPC LISTENERS ----------
   function initIpcListeners() {
     if (!electronAPI) {
-      console.warn(
-        'Electron API not present – running in plain browser mode.'
-      );
+      console.warn('Electron API not present – running in plain browser mode.');
       return;
     }
 
     electronAPI.onToolLog((data) => {
-      if (
-        state.currentRunId &&
-        data.runId &&
-        data.runId !== state.currentRunId
-      )
-        return;
+      if (state.currentRunId && data.runId && data.runId !== state.currentRunId) return;
       const toolId = data.toolId || state.currentToolId || 'tool';
       appendLog(toolId, data.message, data.level || 'info');
     });
 
     electronAPI.onToolStatus((data) => {
-      if (
-        state.currentRunId &&
-        data.runId &&
-        data.runId !== state.currentRunId
-      )
-        return;
+      if (state.currentRunId && data.runId && data.runId !== state.currentRunId) return;
 
       const toolId = data.toolId || state.currentToolId || 'tool';
-      if (data.status) {
-        appendLog(toolId, `ℹ Status: ${data.status}`, 'info');
-      }
-      if (data.metrics) {
-        updateMetrics(toolId, data.metrics);
-      }
+      if (data.status) appendLog(toolId, `ℹ Status: ${data.status}`, 'info');
+      if (data.metrics) updateMetrics(toolId, data.metrics);
     });
 
     electronAPI.onToolExit((data) => {
-      // Always reset the UI when any tool exits so buttons return to normal
       const toolId = data.toolId || state.currentToolId || 'tool';
       const msg = data.error
         ? `✗ Tool "${toolId}" exited with error: ${data.error}`
@@ -888,9 +910,174 @@
     initNavTabs();
     initRunButtons();
     initDirPickers();
-    initSampleButtons();          // 👈 NEW
+    initSampleButtons();
     initPerToolConsoleToggles();
     initIpcListeners();
     initResetButton();
+
+    // Initialize embedded departments multi-select for Contact Details Scraper
+    (function initContactDepartmentSelector() {
+      // ✅ options (your 14) — no explicit "None"
+      const OPTIONS = [
+        'C-Suite',
+        'Product',
+        'Engineering & Technical',
+        'Design',
+        'Education',
+        'Finance',
+        'Human Resources',
+        'Information Technology',
+        'Legal',
+        'Marketing',
+        'Medical & Health',
+        'Operations',
+        'Sales',
+        'Consulting',
+      ];
+
+      const ms = document.getElementById('ms-contact');
+      if (!ms) return;
+
+      const btn = ms.querySelector('.ms-btn');
+      const list = document.getElementById('list-contact');
+      const chips = document.getElementById('chips-contact');
+      const search = document.getElementById('search-contact');
+      const clearBtn = document.getElementById('clearBtn-contact');
+      const selectAllBtn = document.getElementById('selectAll-contact');
+      const countEl = document.getElementById('count-contact');
+      // Removed enable toggle elements
+
+      // outputChoice select (used to disable filter UI when not lead enrichment)
+      const contactCard = document.getElementById('contact-details-scraper');
+      const outputChoiceSelect = contactCard?.querySelectorAll('.form-field .input-field')?.[5] || null;
+
+      const local = { open: false, selected: new Set([]), focusIndex: -1 };
+
+      function isLeadEnrichmentOutput(choice) {
+        return choice === '3' || choice === '4' || choice === '5';
+      }
+
+      function setOpen(next) {
+        local.open = next;
+        ms.classList.toggle('open', next);
+        btn.setAttribute('aria-expanded', String(next));
+        if (next) {
+          if (search) search.value = '';
+          local.focusIndex = -1;
+          renderList();
+          setTimeout(() => search?.focus?.(), 50);
+        }
+      }
+
+      function renderChips() {
+        chips.innerHTML = '';
+        if (local.selected.size === 0) {
+          const ph = document.createElement('div');
+          ph.className = 'placeholder';
+          ph.textContent = 'Select departments...';
+          chips.appendChild(ph);
+          return;
+        }
+
+        [...local.selected].forEach((val) => {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.innerHTML = `<span title="${val}">${val}</span><button type="button" aria-label="Remove ${val}">×</button>`;
+          chip.querySelector('button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            local.selected.delete(val);
+            renderAll();
+          });
+          chips.appendChild(chip);
+        });
+      }
+
+      function renderList() {
+        const q = (search?.value || '').trim().toLowerCase();
+        list.innerHTML = '';
+
+        const filtered = OPTIONS.filter((opt) => opt.toLowerCase().includes(q));
+
+        filtered.forEach((opt, idx) => {
+          const row = document.createElement('div');
+          row.className = 'item' + (local.selected.has(opt) ? ' selected' : '');
+          row.setAttribute('role', 'option');
+          row.setAttribute('aria-selected', String(local.selected.has(opt)));
+          row.setAttribute('data-index', String(idx));
+          row.innerHTML = `<span class="check"><span class="tick"></span></span><span>${opt}</span>`;
+
+          row.addEventListener('click', () => {
+            if (local.selected.has(opt)) local.selected.delete(opt);
+            else local.selected.add(opt);
+            renderAll(false);
+          });
+
+          // Keyboard support for items
+          row.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (local.selected.has(opt)) local.selected.delete(opt);
+              else local.selected.add(opt);
+              renderAll(false);
+            }
+          });
+
+          list.appendChild(row);
+        });
+
+        countEl.textContent = String(local.selected.size);
+      }
+
+      function renderAll(closeMenu = true) {
+        renderChips();
+        renderList();
+        if (closeMenu) setOpen(false);
+      }
+
+      function enforceOutputChoiceRules() {
+        const choice = outputChoiceSelect?.value || '5';
+        const allow = isLeadEnrichmentOutput(choice);
+        // Visually allow selection always; just no-op on send if not enrichment
+        ms.style.opacity = '1';
+        ms.style.pointerEvents = 'auto';
+        if (!allow) {
+          // no enforced clearing; empty selection means none
+        }
+      }
+
+      btn.addEventListener('click', () => setOpen(!local.open));
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setOpen(!local.open);
+        }
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!ms.contains(e.target)) setOpen(false);
+      });
+
+      search?.addEventListener('input', renderList);
+
+      clearBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        local.selected.clear();
+        renderAll(false);
+      });
+
+      selectAllBtn?.addEventListener('click', () => {
+        local.selected.clear();
+        OPTIONS.forEach((o) => local.selected.add(o));
+        renderAll(false);
+      });
+
+      // watch output type changes
+      outputChoiceSelect?.addEventListener('change', enforceOutputChoiceRules);
+
+      // initial state
+      renderAll(false);
+      enforceOutputChoiceRules();
+    })();
   });
 })();

@@ -655,3 +655,546 @@ select.input-field {
     width: 100%;
   }
 }
+
+/* ============================================================
+   ✅ ADDITIONS: Multi-select dropdown + Dongle toggles
+   (Paste kept in same theme: uses your vars + glow)
+   ============================================================ */
+
+/* --- Multi-select wrapper --- */
+.ms {
+  position: relative;
+  width: 100%;
+}
+
+.ms-btn {
+  width: 100%;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--input);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.ms-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  background: rgba(0, 245, 212, 0.08);
+  opacity: 0;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.ms.open .ms-btn,
+.ms-btn:hover,
+.ms-btn:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 245, 212, 0.18);
+}
+
+.ms.open .ms-btn::before,
+.ms-btn:hover::before {
+  opacity: 1;
+}
+
+.ms.disabled .ms-btn {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* chips area */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1;
+  align-items: center;
+}
+
+.placeholder {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 245, 212, 0.35);
+  background: linear-gradient(135deg, rgba(0, 245, 212, 0.12) 0%, rgba(0, 245, 212, 0.08) 100%);
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(0, 245, 212, 0.05);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.chip:hover::after {
+  opacity: 1;
+}
+
+.chip button {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0.1rem;
+  transition: all 0.15s ease;
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chip button:hover {
+  color: var(--primary);
+  background: rgba(0, 245, 212, 0.1);
+  transform: rotate(90deg);
+}
+
+/* actions (clear + caret) */
+.ms-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  border-color: rgba(0, 245, 212, 0.5);
+  color: var(--foreground);
+  box-shadow: var(--glow-primary);
+}
+
+.ms.disabled .icon-btn {
+  pointer-events: none;
+}
+
+/* caret */
+.caret {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+  transform: rotate(45deg);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+  margin-right: 2px;
+  opacity: 0.8;
+}
+
+.ms-btn:hover .caret {
+  opacity: 1;
+}
+
+.ms.open .caret {
+  transform: rotate(-135deg);
+  opacity: 1;
+}
+
+/* dropdown menu */
+.ms-menu {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: none;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: hsl(222, 47%, 7%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.ms.open .ms-menu {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Flatten the multiselect when placed inside a card to avoid double-inset look */
+.card .ms-btn {
+  background: transparent;
+  border-color: rgba(255,255,255,0.08);
+  padding: 0.25rem 0.5rem;
+}
+.card .ms-menu {
+  left: 0;
+  right: 0;
+}
+.card .ms-actions .icon-btn {
+  border-color: rgba(255,255,255,0.08);
+}
+
+.ms-search {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ms-search input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: var(--foreground);
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.9rem;
+}
+
+.ms-search input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.ms-search input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 245, 212, 0.18);
+  background: rgba(0, 245, 212, 0.04);
+}
+
+.ms-list {
+  max-height: 260px;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.ms-list::-webkit-scrollbar {
+  width: 8px;
+}
+.ms-list::-webkit-scrollbar-track {
+  background: hsl(222, 47%, 6%);
+}
+.ms-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 212, 0.25);
+  border-radius: 9999px;
+}
+.ms-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 212, 0.4);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.6rem;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  color: var(--foreground);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 245, 212, 0.05);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.item:hover::before {
+  opacity: 1;
+}
+
+.item.selected {
+  background: rgba(0, 245, 212, 0.08);
+}
+
+.check {
+  width: 18px;
+  height: 18px;
+  border-radius: 0.35rem;
+  border: 1.5px solid var(--border);
+  background: var(--input);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.item:hover .check {
+  border-color: var(--primary);
+}
+
+.item.selected .check {
+  border-color: rgba(0, 245, 212, 0.8);
+  background: rgba(0, 245, 212, 0.25);
+  box-shadow: var(--glow-primary);
+  transform: scale(1.05);
+}
+
+.tick {
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid rgba(255, 255, 255, 0.95);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.95);
+  transform: rotate(-45deg) scale(0.8);
+  display: none;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.item.selected .tick {
+  display: block;
+  transform: rotate(-45deg) scale(1);
+}
+
+.ms-footer {
+  padding: 0.7rem 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* footer pill button */
+.pill {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 245, 212, 0.35);
+  background: rgba(0, 245, 212, 0.08);
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.pill:hover {
+  background: rgba(0, 245, 212, 0.14);
+  box-shadow: var(--glow-primary);
+  color: var(--foreground);
+}
+
+/* --- Dongle Toggle --- */
+.toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.toggle .title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.toggle .title strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.toggle .title span {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+/* small variant (use this for social/proxy toggles) */
+.toggle.mini {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.65rem;
+}
+
+.toggle.mini .title strong {
+  font-size: 0.85rem;
+}
+
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.18s ease;
+}
+
+.switch.on {
+  background: rgba(0, 245, 212, 0.18);
+  border-color: rgba(0, 245, 212, 0.6);
+  box-shadow: var(--glow-primary);
+}
+
+.switch.on::after {
+  left: calc(100% - 26px);
+  background: rgba(0, 245, 212, 0.95);
+}
+
+/* ============================================================
+   ✅ Layout grids + cards (alignment & consistency)
+   ============================================================ */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.one-col-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.card,
+.toggle-card,
+.input-card {
+  background: linear-gradient(180deg, #0f172a, #020617);
+  border-radius: 14px;
+  padding: 16px 18px;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Toggle alignment block (standalone variant) */
+.toggle-card .toggle,
+.card .toggle {
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: #1e293b;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle-card .toggle.on,
+.card .toggle.on {
+  background: #14f1c1;
+}
+
+.toggle-card .toggle::after,
+.card .toggle::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s ease;
+}
+
+.toggle-card .toggle.on::after,
+.card .toggle.on::after {
+  transform: translateX(20px);
+}
