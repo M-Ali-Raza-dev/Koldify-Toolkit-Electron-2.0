@@ -111,43 +111,70 @@ const FIRST_NAME_COL = "First Name";
 const LAST_NAME_COL = "Last Name";
 
 // Rate limit config (Blitz: 5 req / sec, ~18k/hour)
-const MAX_REQUESTS_PER_SECOND = 5;
+const MAX_CONCURRENT_REQUESTS = 10;
+const MAX_REQUESTS_PER_SECOND = 4;
 
 /* ========================
  * SIMPLE RATE LIMITER
  * ======================*/
 
-// Instead of a fancy queue + flushing on stop, we do a simple job queue
-// that keeps running until:
-//  - all jobs are done, AND
-//  - stop was requested → then we clear the interval.
+// Send up to 10 concurrent requests, but respect rate limit of ~2 per second
 const jobQueue = [];
-let rateLimiterStarted = false;
-let rateInterval = null;
+let activeRequests = 0;
+let rateLimiterInterval = null;
+let lastRequestTime = 0;
 
 // cache per profile URL to avoid multiple Blitz calls for same person
 const blitzCache = new Map();
 
 function startRateLimiter() {
-  if (rateLimiterStarted) return;
-  rateLimiterStarted = true;
+  if (rateLimiterInterval) return;
 
-  rateInterval = setInterval(() => {
-    let processed = 0;
+  // Process jobs from queue every 50ms
+  rateLimiterInterval = setInterval(async () => {
+    if (jobQueue.length === 0 && activeRequests === 0) {
+      return; // Nothing to do, but keep checking
+    }
 
-    // Process up to MAX_REQUESTS_PER_SECOND jobs per second
-    while (processed < MAX_REQUESTS_PER_SECOND && jobQueue.length > 0) {
+    // Respect rate limit: wait if needed
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+    const minTimeBetweenRequests = 1000 / MAX_REQUESTS_PER_SECOND;
+    
+    if (timeSinceLastRequest < minTimeBetweenRequests) {
+      return; // Wait for next interval tick
+    }
+
+    // Start new requests if under concurrency limit
+    while (activeRequests < MAX_CONCURRENT_REQUESTS && jobQueue.length > 0) {
+      if (shouldStop()) {
+        // Don't start new jobs, but let existing ones finish
+        break;
+      }
+
       const job = jobQueue.shift();
-      runJob(job);
-      processed++;
-    }
+      activeRequests++;
+      lastRequestTime = Date.now();
 
-    // If we've been asked to stop, and there is nothing left to send,
-    // we can safely clear the interval. The main loop will also exit.
-    if (jobQueue.length === 0 && shouldStop()) {
-      clearInterval(rateInterval);
+      runJob(job).finally(() => {
+        activeRequests--;
+      });
+
+      // Check rate limit again after starting a job
+      const nowAfterStart = Date.now();
+      const timeSince = nowAfterStart - lastRequestTime;
+      if (timeSince < minTimeBetweenRequests) {
+        break; // Don't start more jobs this tick
+      }
     }
-  }, 1000);
+  }, 50);
+}
+
+function stopRateLimiter() {
+  if (rateLimiterInterval) {
+    clearInterval(rateLimiterInterval);
+    rateLimiterInterval = null;
+  }
 }
 
 function enqueueJob(job) {
@@ -383,6 +410,15 @@ async function processAllFiles() {
   }
 
   console.log("\n✅ Blitz enrichment run finished.");
+  
+  // Wait for any remaining jobs to finish
+  let waitCount = 0;
+  while ((jobQueue.length > 0 || activeRequests > 0) && waitCount < 600) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    waitCount++;
+  }
+  
+  stopRateLimiter();
 }
 
 /**
