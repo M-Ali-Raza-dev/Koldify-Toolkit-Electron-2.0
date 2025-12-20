@@ -1042,17 +1042,18 @@
                 <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
               </div>
               <div class="form-field">
-                <label>Input folder (CSV files)</label>
+                <label>Input CSV file</label>
                 <div class="input-with-button">
-                  <input id="blitz-email-input-dir" type="text" class="input-field" placeholder="./input">
+                  <input id="blitz-email-input-file" type="text" class="input-field" placeholder="./input/leads.csv">
                   <button
                     type="button"
                     class="btn-ghost small"
-                    data-role="pick-dir"
-                    data-target="blitz-email-input-dir"
+                    data-role="pick-file"
+                    data-target="blitz-email-input-file"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
                   >Browse</button>
                 </div>
-                <span class="hint">Each CSV must contain columns like 'Person Linkedin Url', 'Job Title', etc.</span>
+                <span class="hint">CSV must contain columns like 'Person Linkedin Url', 'Job Title', 'First Name', 'Last Name', etc.</span>
               </div>
               <div class="form-field">
                 <label>Output folder</label>
@@ -1092,8 +1093,16 @@
             </div>
             <div class="status-bar">
               <div class="status-pill">
+                <span>Total Rows:</span>
+                <strong data-metric="blitz-email-total-rows">0</strong>
+              </div>
+              <div class="status-pill">
                 <span>Rows Processed:</span>
                 <strong data-metric="blitz-email-rows-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Already Done Posts:</span>
+                <strong data-metric="blitz-email-skipped-done">0</strong>
               </div>
               <div class="status-pill">
                 <span>Emails Found:</span>

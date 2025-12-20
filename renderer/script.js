@@ -158,7 +158,9 @@
 
       // BLITZ
       case 'email-enricher':
+        set('blitz-email-total-rows', metrics.totalRows);
         set('blitz-email-rows-processed', metrics.rowsProcessed);
+        set('blitz-email-skipped-done', metrics.skippedDone);
         set('blitz-email-found', metrics.emailsFound);
         set('blitz-email-not-found', metrics.emailsNotFound);
         break;
@@ -267,6 +269,40 @@
           if (input) input.value = selectedPath;
         } catch (err) {
           console.error('Failed to open folder picker:', err);
+        }
+      });
+    });
+  }
+
+  // ---------- FILE PICKERS ----------
+  function initFilePickers() {
+    if (!electronAPI) return;
+
+    const fileButtons = document.querySelectorAll('[data-role="pick-file"]');
+    fileButtons.forEach((btn) => {
+      const targetId = btn.getAttribute('data-target');
+      if (!targetId) return;
+
+      btn.addEventListener('click', async () => {
+        try {
+          let filters = [];
+          const filtersAttr = btn.getAttribute('data-filters');
+          if (filtersAttr) {
+            try {
+              filters = JSON.parse(filtersAttr).map(([name, extensions]) => ({
+                name,
+                extensions,
+              }));
+            } catch {}
+          }
+
+          const selectedPath = await electronAPI.selectFile({ filters });
+          if (!selectedPath) return;
+
+          const input = document.getElementById(targetId);
+          if (input) input.value = selectedPath;
+        } catch (err) {
+          console.error('Failed to open file picker:', err);
         }
       });
     });
@@ -557,16 +593,16 @@
       case 'email-enricher': {
         const apiKey =
           document.getElementById('blitz-email-api-key')?.value?.trim() || '';
-        const inputDir =
-          document.getElementById('blitz-email-input-dir')?.value?.trim() || '';
+        const inputFile =
+          document.getElementById('blitz-email-input-file')?.value?.trim() || '';
         const outputDir =
           document.getElementById('blitz-email-output-dir')?.value?.trim() || '';
         const outputFileName =
           document.getElementById('blitz-email-output-filename')?.value?.trim() ||
           'enriched_output.csv';
 
-        if (!inputDir) {
-          alert('Please select an input folder');
+        if (!inputFile) {
+          alert('Please select an input CSV file');
           return null;
         }
         if (!outputDir) {
@@ -576,10 +612,9 @@
 
         return {
           apiKey,
-          inputDir,
+          inputFile,
           outputFileName,
           outputFile: `${outputDir}\\${outputFileName}`,
-          streamAppend: true,
         };
       }
 
@@ -910,6 +945,7 @@
     initNavTabs();
     initRunButtons();
     initDirPickers();
+    initFilePickers();
     initSampleButtons();
     initPerToolConsoleToggles();
     initIpcListeners();
