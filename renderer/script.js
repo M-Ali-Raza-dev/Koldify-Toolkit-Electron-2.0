@@ -600,6 +600,8 @@
         const outputFileName =
           document.getElementById('blitz-email-output-filename')?.value?.trim() ||
           'enriched_output.csv';
+        const checkpointBatch =
+          parseInt(document.getElementById('blitz-email-checkpoint-batch')?.value?.trim() || '50', 10);
 
         if (!inputFile) {
           alert('Please select an input CSV file');
@@ -615,6 +617,7 @@
           inputFile,
           outputFileName,
           outputFile: `${outputDir}\\${outputFileName}`,
+          checkpointBatchSize: checkpointBatch,
         };
       }
 

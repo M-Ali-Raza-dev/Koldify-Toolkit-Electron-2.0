@@ -1073,6 +1073,11 @@
                 <span class="hint">Name of the combined CSV file (will be created in output folder)</span>
               </div>
               <div class="form-field">
+                <label>Checkpoint batch size</label>
+                <input id="blitz-email-checkpoint-batch" type="number" class="input-field" placeholder="50" value="50" min="1" max="500">
+                <span class="hint">Save 'done' status to input CSV every N rows (1=safest/slowest, 50=balanced, 100=fastest). Lower values = less data loss on crash.</span>
+              </div>
+              <div class="form-field">
                 <div class="info-box">Rate limit: 5 requests/sec (~18k leads/hour)</div>
               </div>
             </div>

@@ -102,7 +102,11 @@ const STATUS_COL = "Status"; // ✅ NEW
 
 // Rate limit config (Blitz: 5 req / sec, ~18k/hour)
 const MAX_CONCURRENT_REQUESTS = 10;
-const MAX_REQUESTS_PER_SECOND = 4;
+const MAX_REQUESTS_PER_SECOND = 5;
+const CHECKPOINT_BATCH_SIZE = parseInt(
+  getArg("--checkpoint-batch", fromEnv("checkpointBatchSize", "50")),
+  10
+) || 50; // Checkpoint every N rows instead of every row
 
 /* ========================
  * LOGGING (clean + structured)
@@ -177,9 +181,6 @@ function startRateLimiter() {
       runJob(job).finally(() => {
         activeRequests--;
       });
-
-      // Let next tick handle rate pacing
-      break;
     }
   }, 50);
 }
@@ -595,9 +596,11 @@ async function processSingleCsvFile() {
     // ✅ output append immediately
     await csvWriter.writeRecords([enrichedRow]);
 
-    // ✅ mark input row done immediately (checkpoint)
+    // ✅ mark input row done (checkpoint in batches)
     row[STATUS_COL] = "done";
-    await checkpointInputCsv(INPUT_FILE, rows, headerOrder);
+    if (apiTouchedCount % CHECKPOINT_BATCH_SIZE === 0 || processedCount === rows.length) {
+      await checkpointInputCsv(INPUT_FILE, rows, headerOrder);
+    }
 
     emitMetrics({
       phase: "running",
@@ -610,6 +613,9 @@ async function processSingleCsvFile() {
       skippedDone: skippedDoneCount,
     });
   }
+
+  // Final checkpoint to save any remaining rows
+  await checkpointInputCsv(INPUT_FILE, rows, headerOrder);
 
   console.log("\n📁 Output file: " + OUTPUT_FILE);
   console.log("📌 Summary");
