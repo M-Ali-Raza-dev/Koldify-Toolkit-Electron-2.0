@@ -93,12 +93,22 @@ const BLITZ_API_KEY = getArg("--api-key", fromEnv("apiKey", process.env.BLITZ_AP
 
 // Column names in input CSV
 const PROFILE_URL_COL = "Person Linkedin Url";
+const LINKEDIN_URL_COL =
+  process.env.LINKEDIN_URL_COLUMN || getArg("--linkedin-col", fromEnv("linkedinUrlColumn", PROFILE_URL_COL));
 const POSITION_COL = "Job Title";
 const POST_URL_COL = "Post Url";
 const AUTHOR_NAME_COL = "Author Name";
 const FIRST_NAME_COL = "First Name";
 const LAST_NAME_COL = "Last Name";
 const STATUS_COL = "Status"; // ✅ NEW
+
+const BLITZ_OUTPUT_COLUMNS = [
+  "Email [Blitz]",
+  "Email Domain [Blitz]",
+  "Company Name [Blitz]",
+  "Company Website [Blitz]",
+  "Company Linkedin Url [Blitz]",
+];
 
 // Rate limit config (Blitz: 5 req / sec, ~18k/hour)
 const MAX_CONCURRENT_REQUESTS = 10;
@@ -121,6 +131,31 @@ function ensureDir(p) {
 
 function safeStr(x) {
   return (x ?? "").toString();
+}
+
+function safeReplaceFile(src, dest) {
+  try {
+    fs.renameSync(src, dest);
+    return;
+  } catch (err) {
+    if (err && (err.code === "EPERM" || err.code === "EACCES")) {
+      // Windows sometimes holds the target; fall back to copy + unlink
+      fs.copyFileSync(src, dest);
+      fs.unlinkSync(src);
+      return;
+    }
+    throw err;
+  }
+}
+
+function valueFromColumns(row, columns = [], fallback = "") {
+  for (const col of columns) {
+    if (col && Object.prototype.hasOwnProperty.call(row, col)) {
+      const val = safeStr(row[col]).trim();
+      if (val) return val;
+    }
+  }
+  return fallback;
 }
 
 // Will be initialized once OUTPUT_FILE is known
@@ -286,26 +321,18 @@ function normalizeStatus(s) {
  * ======================*/
 let globalCsvWriter = null;
 
-function getCsvWriter() {
+function getCsvWriter(headers) {
   if (globalCsvWriter) return globalCsvWriter;
+
+  if (!Array.isArray(headers) || headers.length === 0) {
+    throw new Error("Output headers are required to create CSV writer");
+  }
 
   const fileExists = fs.existsSync(OUTPUT_FILE);
 
   globalCsvWriter = createCsvWriter({
     path: OUTPUT_FILE,
-    header: [
-      { id: "FIRST_NAME", title: "First name" },
-      { id: "LAST_NAME", title: "Last name" },
-      { id: "JOBTITLE", title: "Jobtitle" },
-      { id: "EMAIL", title: "Email" },
-      { id: "EMAIL_DOMAIN", title: "Email domain" },
-      { id: "COMPANY_NAME", title: "Company name" },
-      { id: "COMPANY_WEBSITE", title: "Company website" },
-      { id: "COMPANY_LINKEDIN_URL", title: "Company linkedin url" },
-      { id: "Author", title: "Author" },
-      { id: "Post_URL", title: "Post linkedin url" },
-      { id: "Profile_URL", title: "Profile url" },
-    ],
+    header: headers.map((h) => ({ id: h, title: h })),
     append: fileExists,
   });
 
@@ -337,7 +364,8 @@ async function checkpointInputCsv(inputPath, rows, headers) {
     })
   );
 
-  fs.renameSync(tmpPath, inputPath);
+  // On Windows, rename can fail with EPERM if the file is locked (e.g., open in Excel or AV)
+  safeReplaceFile(tmpPath, inputPath);
 }
 
 /* ========================
@@ -382,6 +410,7 @@ async function processSingleCsvFile() {
   console.log("======================================");
   console.log(`📄 Input CSV   : ${INPUT_FILE}`);
   console.log(`📁 Output file : ${OUTPUT_FILE}`);
+  console.log(`🔗 LinkedIn URL column: ${LINKEDIN_URL_COL}`);
   console.log(`🔑 Blitz API key: ${BLITZ_API_KEY ? "OK (set)" : "NOT SET!"}`);
   console.log("💡 Limit: 5 requests/second (~18k leads/hour)");
   console.log("======================================\n");
@@ -409,9 +438,6 @@ async function processSingleCsvFile() {
 
   initLogs();
 
-  // Create output CSV at the beginning
-  getCsvWriter();
-
   // Start rate limiter (for Blitz calls)
   startRateLimiter();
 
@@ -429,6 +455,13 @@ async function processSingleCsvFile() {
       .on("end", resolve)
       .on("error", reject);
   });
+
+  if (!headerOrder.includes(LINKEDIN_URL_COL)) {
+    console.error(
+      `❌ Selected LinkedIn URL column "${LINKEDIN_URL_COL}" not found. Headers detected: ${headerOrder.join(", ")}`
+    );
+    process.exit(1);
+  }
 
   // Ensure Status column exists on all rows; if missing in file, add and checkpoint once
   const hadStatusHeader = headerOrder.includes(STATUS_COL);
@@ -453,6 +486,13 @@ async function processSingleCsvFile() {
 
   console.log(`📊 Total rows found: ${rows.length}`);
 
+  const outputHeaderOrder = [...headerOrder];
+  for (const extra of BLITZ_OUTPUT_COLUMNS) {
+    if (!outputHeaderOrder.includes(extra)) outputHeaderOrder.push(extra);
+  }
+
+  const csvWriter = getCsvWriter(outputHeaderOrder);
+
   let processedCount = 0;      // how many rows we iterated over (including done/skipped)
   let apiTouchedCount = 0;     // how many we actually sent to Blitz
   let emailFoundCount = 0;
@@ -469,8 +509,6 @@ async function processSingleCsvFile() {
     emailsNotFound: emailNotFoundCount,
     skippedDone: skippedDoneCount,
   });
-
-  const csvWriter = getCsvWriter();
 
   for (let i = 0; i < rows.length; i++) {
     if (shouldStop()) {
@@ -498,12 +536,12 @@ async function processSingleCsvFile() {
       continue;
     }
 
-    const profileUrl = safeStr(row[PROFILE_URL_COL]).trim();
-    const position = safeStr(row[POSITION_COL]).trim();
-    const authorName = safeStr(row[AUTHOR_NAME_COL]).trim();
-    const postUrl = safeStr(row[POST_URL_COL]).trim();
-    const inputFirstName = safeStr(row[FIRST_NAME_COL]).trim();
-    const inputLastName = safeStr(row[LAST_NAME_COL]).trim();
+    const profileUrl = valueFromColumns(row, [LINKEDIN_URL_COL, PROFILE_URL_COL, "LinkedIn URL", "Profile URL", "linkedin_url"], "");
+    const position = valueFromColumns(row, [POSITION_COL, "Title", "Job Title", "Position"], "");
+    const authorName = valueFromColumns(row, [AUTHOR_NAME_COL, "Author", "Author Name"], "");
+    const postUrl = valueFromColumns(row, [POST_URL_COL, "Post URL", "Post Url"], "");
+    const inputFirstName = valueFromColumns(row, [FIRST_NAME_COL, "First Name", "Firstname", "first_name"], "");
+    const inputLastName = valueFromColumns(row, [LAST_NAME_COL, "Last Name", "Lastname", "last_name"], "");
 
     if (!profileUrl) {
       console.log(`⚠️  [Row ${processedCount}] Missing LinkedIn profile URL. Marking done + skipping.`);
@@ -579,25 +617,19 @@ async function processSingleCsvFile() {
     const domainCompanyName = companyNameFromDomain(domain);
     const finalCompanyName = posCompanyName || domainCompanyName;
 
-    const enrichedRow = {
-      FIRST_NAME: capitalizeFirstWord(inputFirstName),
-      LAST_NAME: capitalizeFirstWord(inputLastName),
-      JOBTITLE: capitalizeFirstWord(jobTitle),
-      EMAIL: email,
-      EMAIL_DOMAIN: emailDomain,
-      COMPANY_NAME: capitalizeFirstWord(finalCompanyName),
-      COMPANY_WEBSITE: website,
-      COMPANY_LINKEDIN_URL: companyLinkedinUrl,
-      Author: capitalizeFirstWord(authorName),
-      Post_URL: postUrl,
-      Profile_URL: profileUrl,
-    };
-
-    // ✅ output append immediately
-    await csvWriter.writeRecords([enrichedRow]);
-
-    // ✅ mark input row done (checkpoint in batches)
     row[STATUS_COL] = "done";
+
+    const outputRow = { ...row };
+    outputRow[BLITZ_OUTPUT_COLUMNS[0]] = email;
+    outputRow[BLITZ_OUTPUT_COLUMNS[1]] = emailDomain;
+    outputRow[BLITZ_OUTPUT_COLUMNS[2]] = capitalizeFirstWord(finalCompanyName);
+    outputRow[BLITZ_OUTPUT_COLUMNS[3]] = website;
+    outputRow[BLITZ_OUTPUT_COLUMNS[4]] = companyLinkedinUrl;
+
+    // ✅ output append immediately, preserving all input columns and adding Blitz columns
+    await csvWriter.writeRecords([outputRow]);
+
+    // ✅ checkpoint input rows in batches
     if (apiTouchedCount % CHECKPOINT_BATCH_SIZE === 0 || processedCount === rows.length) {
       await checkpointInputCsv(INPUT_FILE, rows, headerOrder);
     }

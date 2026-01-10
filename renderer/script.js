@@ -9,6 +9,9 @@
   const apifySidebar = document.getElementById('apify-sidebar');
   const blitzSidebar = document.getElementById('blitz-sidebar');
 
+  const blitzUrlSelect = document.getElementById('blitz-email-url-column');
+  const blitzInputFile = document.getElementById('blitz-email-input-file');
+
   const navTabs = document.querySelectorAll('.nav-tab');
   const toolCards = document.querySelectorAll('.tool-card');
 
@@ -86,6 +89,59 @@
     state.currentToolId = null;
     setRunningUI(false, null);
     setStoppingUI(false);
+  }
+
+  // ---------- BLITZ EMAIL PREVIEW ----------
+  function detectLinkedinColumn(headers = []) {
+    const lowered = headers.map((h) => h.toLowerCase());
+    const candidates = lowered.filter((h) => h.includes('linkedin') || h.includes('profile'));
+    if (!candidates.length) return '';
+
+    // Prefer headers that also mention url/id
+    const urlish = candidates.find((h) => h.includes('url') || h.includes('link'));
+    const chosen = urlish || candidates[0];
+    const originalIdx = lowered.indexOf(chosen);
+    return headers[originalIdx] || '';
+  }
+
+  function populateBlitzUrlSelect(headers = []) {
+    if (!blitzUrlSelect) return;
+    const previous = blitzUrlSelect.value;
+
+    blitzUrlSelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = headers.length ? 'Pick LinkedIn URL column' : 'Select a column';
+    blitzUrlSelect.appendChild(placeholder);
+
+    headers.forEach((h) => {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = h;
+      blitzUrlSelect.appendChild(opt);
+    });
+
+    if (previous && headers.includes(previous)) {
+      blitzUrlSelect.value = previous;
+    }
+  }
+
+  async function loadBlitzHeaders() {
+    if (!electronAPI || !blitzInputFile) return;
+    const filePath = blitzInputFile.value?.trim();
+    if (!filePath) return;
+
+    try {
+      const { headers = [] } = await electronAPI.previewCsv(filePath, 1);
+      populateBlitzUrlSelect(headers);
+
+      const detected = detectLinkedinColumn(headers);
+      if (detected && blitzUrlSelect && !blitzUrlSelect.value) {
+        blitzUrlSelect.value = detected;
+      }
+    } catch (err) {
+      console.error('Failed to read CSV headers:', err);
+    }
   }
 
   // ---------- METRICS ----------
@@ -300,12 +356,27 @@
           if (!selectedPath) return;
 
           const input = document.getElementById(targetId);
-          if (input) input.value = selectedPath;
+          if (input) {
+            input.value = selectedPath;
+            input.dispatchEvent(new Event('change'));
+          }
         } catch (err) {
           console.error('Failed to open file picker:', err);
         }
       });
     });
+  }
+
+  function initBlitzPreview() {
+    if (!electronAPI) return;
+
+    if (blitzInputFile) {
+      blitzInputFile.addEventListener('change', () => {
+        if (blitzInputFile.value?.trim()) {
+          loadBlitzHeaders();
+        }
+      });
+    }
   }
 
   // ---------- SAMPLE INPUT BUTTONS ----------
@@ -595,6 +666,8 @@
           document.getElementById('blitz-email-api-key')?.value?.trim() || '';
         const inputFile =
           document.getElementById('blitz-email-input-file')?.value?.trim() || '';
+        const linkedinUrlColumn =
+          document.getElementById('blitz-email-url-column')?.value?.trim() || '';
         const outputDir =
           document.getElementById('blitz-email-output-dir')?.value?.trim() || '';
         const outputFileName =
@@ -607,6 +680,10 @@
           alert('Please select an input CSV file');
           return null;
         }
+        if (!linkedinUrlColumn) {
+          alert('Please choose which column contains the LinkedIn profile URLs.');
+          return null;
+        }
         if (!outputDir) {
           alert('Please select an output folder');
           return null;
@@ -615,6 +692,7 @@
         return {
           apiKey,
           inputFile,
+          linkedinUrlColumn,
           outputFileName,
           outputFile: `${outputDir}\\${outputFileName}`,
           checkpointBatchSize: checkpointBatch,
@@ -949,6 +1027,7 @@
     initRunButtons();
     initDirPickers();
     initFilePickers();
+    initBlitzPreview();
     initSampleButtons();
     initPerToolConsoleToggles();
     initIpcListeners();

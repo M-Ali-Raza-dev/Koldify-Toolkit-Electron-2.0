@@ -2,6 +2,7 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs'); // ✅ for sample copying
+const csv = require('csv-parser');
 const { spawn } = require('child_process');
 const { randomUUID } = require('crypto');
 
@@ -128,6 +129,7 @@ const toolRegistry = {
     buildEnv: (payload) => ({
       TOOL_CONFIG: JSON.stringify(payload || {}),
       BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      LINKEDIN_URL_COLUMN: payload.linkedinUrlColumn || undefined,
     }),
   },
 
@@ -304,6 +306,45 @@ function handleStdoutLine(runId, toolId, rawLine, defaultLevel = 'info') {
   // 3) Plain text
   sendToolLog(runId, toolId, defaultLevel, line);
 }
+
+// ================================
+// 📄 CSV PREVIEW (first N rows)
+// ================================
+ipcMain.handle('csv:preview', async (_event, { filePath, limit = 3 }) => {
+  if (!filePath) throw new Error('filePath is required');
+
+  const resolvedPath = path.resolve(filePath);
+  if (!fs.existsSync(resolvedPath)) {
+    throw new Error(`File not found: ${resolvedPath}`);
+  }
+
+  const maxRows = Math.max(1, Number(limit) || 3);
+
+  return new Promise((resolve, reject) => {
+    const previewRows = [];
+    let headers = [];
+
+    const stream = fs
+      .createReadStream(resolvedPath)
+      .pipe(csv())
+      .on('headers', (h) => {
+        headers = Array.isArray(h) ? h : [];
+      })
+      .on('data', (row) => {
+        if (previewRows.length < maxRows) {
+          previewRows.push(row);
+        }
+
+        // Stop early once we have enough rows
+        if (previewRows.length >= maxRows) {
+          stream.destroy();
+          resolve({ headers, rows: previewRows });
+        }
+      })
+      .on('end', () => resolve({ headers, rows: previewRows }))
+      .on('error', reject);
+  });
+});
 
 // ================================
 // ✅ RUN TOOL (tool:run)
