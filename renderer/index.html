@@ -7,6 +7,20 @@
   <meta name="description" content="Powerful automation tools for LinkedIn data extraction and Blitz API enrichment." />
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ Small helper so dongles work via checkbox state (NO JS edits needed) -->
+  <style>
+    /* input:checked -> make dongle ON using your existing .switch styles */
+    .switch-input:checked + .switch {
+      background: rgba(0, 245, 212, 0.18);
+      border-color: rgba(0, 245, 212, 0.6);
+      box-shadow: var(--glow-primary);
+    }
+    .switch-input:checked + .switch::after {
+      left: calc(100% - 26px);
+      background: rgba(0, 245, 212, 0.95);
+    }
+  </style>
 </head>
 <body>
   <header class="header">
@@ -85,6 +99,12 @@
             </svg>
             LinkedIn Profile Enhancer
           </button>
+          <button class="nav-tab" data-tool="contact-details-scraper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path d="M8 11h8"/><path d="M8 15h6"/>
+            </svg>
+            Contact Details Scraper
+          </button>
         </nav>
       </aside>
 
@@ -108,9 +128,9 @@
 
       <!-- Tool Cards Container -->
       <div class="tool-container">
-        
+
         <!-- APIFY TOOLS -->
-        
+
         <!-- Post Finder -->
         <div class="tool-card" id="post-finder" data-section="apify">
           <div class="card-header">
@@ -572,6 +592,200 @@
           </div>
         </div>
 
+        <!-- ✅ Contact Details Scraper -->
+        <div class="tool-card hidden" id="contact-details-scraper" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path d="M8 11h8"/><path d="M8 15h6"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Contact Details Scraper</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Run Apify actor 9Sk4JJhEma9vBKqrg over website URLs with multi-key rotation, exporting All/Social/Lead CSVs.">?</button>
+              </div>
+              <p>Scrapes contact details and social profiles from websites; optional lead enrichment + departments filter</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV (websites)</label>
+                <input type="file" accept=".csv" class="input-field file-input">
+                <span class="hint">CSV with a column containing website URLs</span>
+              </div>
+              <div class="form-field">
+                <label>Keys file (keys.json)</label>
+                <input type="file" accept=".json" class="input-field file-input">
+              </div>
+              <div class="form-field">
+                <label>URL column (optional)</label>
+                <input type="text" class="input-field" placeholder="Website / url / domain">
+              </div>
+              <div class="form-field">
+                <label>Batch size (URLs per key)</label>
+                <input type="number" class="input-field" value="100">
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="contact-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target="contact-output-dir">Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output mode</label>
+                <select class="input-field">
+                  <option value="1">All fields</option>
+                  <option value="2">Social profiles only</option>
+                  <option value="3">Lead enrichment only</option>
+                  <option value="4">Lead + Social (combo)</option>
+                  <option value="5" selected>All outputs</option>
+                </select>
+              </div>
+
+              <!-- Departments Filter (multi-select only) -->
+              <div class="form-field" style="grid-column: 1 / -1;">
+                <label>Departments filter</label>
+
+                <div class="two-col-grid">
+                  <!-- Left: Departments dropdown (labels removed) -->
+                  <div class="card" style="justify-content:flex-start; gap:12px;">
+                    <div class="ms" id="ms-contact" style="width:100%;">
+                        <div class="ms-btn" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+                          <div class="chips" id="chips-contact"></div>
+                          <div class="ms-actions">
+                            <button class="icon-btn" id="clearBtn-contact" type="button" title="Clear">✕</button>
+                            <div class="caret" aria-hidden="true"></div>
+                          </div>
+                        </div>
+                        <div class="ms-menu" role="listbox" aria-multiselectable="true">
+                          <div class="ms-search"><input id="search-contact" type="text" placeholder="Search departments..." autocomplete="off" /></div>
+                          <div class="ms-list" id="list-contact"></div>
+                          <div class="ms-footer">
+                            <div><span id="count-contact">0</span> selected</div>
+                            <button class="pill" id="selectAll-contact" type="button">Select all</button>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ✅ Social profiles switches (keep same IDs) -->
+              <div class="form-field" style="grid-column: 1 / -1;">
+                <label>Social profiles (toggle each)</label>
+
+                <div class="two-col-grid">
+                  <div class="toggle-card">
+                    <div class="card-left"><div class="card-title">Facebooks</div><div class="card-sub">Optional</div></div>
+                    <div class="card-right">
+                      <input id="contact-social-fb" type="checkbox" class="switch-input" />
+                      <label class="switch" for="contact-social-fb" aria-label="Toggle Facebooks"></label>
+                    </div>
+                  </div>
+                  <div class="toggle-card">
+                    <div class="card-left"><div class="card-title">Instagrams</div><div class="card-sub">Optional</div></div>
+                    <div class="card-right">
+                      <input id="contact-social-ig" type="checkbox" class="switch-input" />
+                      <label class="switch" for="contact-social-ig" aria-label="Toggle Instagrams"></label>
+                    </div>
+                  </div>
+                  <div class="toggle-card">
+                    <div class="card-left"><div class="card-title">Youtubes</div><div class="card-sub">Optional</div></div>
+                    <div class="card-right">
+                      <input id="contact-social-yt" type="checkbox" class="switch-input" />
+                      <label class="switch" for="contact-social-yt" aria-label="Toggle Youtubes"></label>
+                    </div>
+                  </div>
+                  <div class="toggle-card">
+                    <div class="card-left"><div class="card-title">Tiktoks</div><div class="card-sub">Optional</div></div>
+                    <div class="card-right">
+                      <input id="contact-social-tt" type="checkbox" class="switch-input" />
+                      <label class="switch" for="contact-social-tt" aria-label="Toggle Tiktoks"></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="one-col-grid" style="margin-top:16px;">
+                  <div class="toggle-card">
+                    <div class="card-left"><div class="card-title">Twitters</div><div class="card-sub">Optional</div></div>
+                    <div class="card-right">
+                      <input id="contact-social-tw" type="checkbox" class="switch-input" />
+                      <label class="switch" for="contact-social-tw" aria-label="Toggle Twitters"></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ✅ Proxy switch (keep same ID) -->
+              <div class="form-field" style="grid-column: 1 / -1;">
+                <label>Proxy (Apify)</label>
+
+                <div class="toggle-card" style="margin-bottom: 12px;">
+                  <div class="card-left"><div class="card-title">Use Apify Proxy</div><div class="card-sub">Recommended</div></div>
+                  <div class="card-right">
+                    <input id="contact-proxy-enable" type="checkbox" class="switch-input" checked />
+                    <label class="switch" for="contact-proxy-enable" aria-label="Toggle Proxy"></label>
+                  </div>
+                </div>
+
+                <div class="two-col-grid">
+                  <div class="input-card">
+                    <div class="card-left"><div class="card-title">Proxy groups</div><div class="card-sub">Comma-separated</div></div>
+                    <div class="card-right" style="width:60%;">
+                      <input id="contact-proxy-groups" type="text" class="input-field" placeholder="e.g. SHADER,BUYPROXY-US">
+                    </div>
+                  </div>
+                  <div class="input-card">
+                    <div class="card-left"><div class="card-title">Proxy country</div><div class="card-sub">ISO code</div></div>
+                    <div class="card-right" style="width:40%;">
+                      <input id="contact-proxy-country" type="text" class="input-field" placeholder="e.g. US">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="contact-details-scraper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/>
+                </svg>
+                Run Contact Details Scraper
+              </button>
+              <button type="button" class="btn-ghost small sample-btn" data-sample-id="apify-contact-details-scraper">Sample input</button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total Keys:</span>
+                <strong data-metric="contact-total-keys">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Chunks Processed:</span>
+                <strong data-metric="contact-chunks-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>URLs Loaded:</span>
+                <strong data-metric="contact-urls-total">0</strong>
+              </div>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button type="button" class="btn-ghost small console-toggle" data-tool-id="contact-details-scraper">Expand Log</button>
+              </div>
+              <pre class="console" id="console-contact-details-scraper">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
         <!-- Apify Email Enricher -->
         <div class="tool-card hidden" id="apify-email-enricher" data-section="apify">
           <div class="card-header">
@@ -828,17 +1042,25 @@
                 <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
               </div>
               <div class="form-field">
-                <label>Input folder (CSV files)</label>
+                <label>Input CSV file</label>
                 <div class="input-with-button">
-                  <input id="blitz-email-input-dir" type="text" class="input-field" placeholder="./input">
+                  <input id="blitz-email-input-file" type="text" class="input-field" placeholder="./input/leads.csv">
                   <button
                     type="button"
                     class="btn-ghost small"
-                    data-role="pick-dir"
-                    data-target="blitz-email-input-dir"
+                    data-role="pick-file"
+                    data-target="blitz-email-input-file"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
                   >Browse</button>
                 </div>
-                <span class="hint">Each CSV must contain columns like 'Person Linkedin Url', 'Job Title', etc.</span>
+                <span class="hint">CSV must contain columns like 'Person Linkedin Url', 'Job Title', 'First Name', 'Last Name', etc.</span>
+              </div>
+              <div class="form-field">
+                <label>LinkedIn URL column</label>
+                <select id="blitz-email-url-column" class="input-field">
+                  <option value="">Select a column</option>
+                </select>
+                <span class="hint">Pick which column holds LinkedIn profile URLs.</span>
               </div>
               <div class="form-field">
                 <label>Output folder</label>
@@ -856,6 +1078,11 @@
                 <label>Combined output filename</label>
                 <input id="blitz-email-output-filename" type="text" class="input-field" placeholder="enriched_output.csv" value="enriched_output.csv">
                 <span class="hint">Name of the combined CSV file (will be created in output folder)</span>
+              </div>
+              <div class="form-field">
+                <label>Checkpoint batch size</label>
+                <input id="blitz-email-checkpoint-batch" type="number" class="input-field" placeholder="50" value="50" min="1" max="500">
+                <span class="hint">Save 'done' status to input CSV every N rows (1=safest/slowest, 50=balanced, 100=fastest). Lower values = less data loss on crash.</span>
               </div>
               <div class="form-field">
                 <div class="info-box">Rate limit: 5 requests/sec (~18k leads/hour)</div>
@@ -878,8 +1105,16 @@
             </div>
             <div class="status-bar">
               <div class="status-pill">
+                <span>Total Rows:</span>
+                <strong data-metric="blitz-email-total-rows">0</strong>
+              </div>
+              <div class="status-pill">
                 <span>Rows Processed:</span>
                 <strong data-metric="blitz-email-rows-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Already Done Posts:</span>
+                <strong data-metric="blitz-email-skipped-done">0</strong>
               </div>
               <div class="status-pill">
                 <span>Emails Found:</span>

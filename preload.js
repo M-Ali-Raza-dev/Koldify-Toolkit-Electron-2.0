@@ -85,5 +85,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const listener = (_event, data) => callback(data);
     ipcRenderer.on('tool:exit', listener);
     return () => ipcRenderer.removeListener('tool:exit', listener);
+  },
+
+  /**
+   * Preview a CSV file: returns headers and the first N rows (default 3)
+   */
+  previewCsv: (filePath, limit = 3) => {
+    return ipcRenderer.invoke('csv:preview', { filePath, limit });
   }
 });

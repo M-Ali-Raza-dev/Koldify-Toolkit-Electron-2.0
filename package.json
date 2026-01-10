@@ -1,6 +1,6 @@
 {
   "name": "koldify-toolkit-electron",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "description": "Koldify Toolkit – Apify + Blitz Automation Desktop App",
   "main": "main.js",
   "author": "Koldify",
@@ -30,6 +30,13 @@
     "directories": {
       "output": "dist"
     },
+
+    "asar": true,
+    "asarUnpack": [
+      "backend/**",
+      "samples/**"
+    ],
+
     "files": [
       "main.js",
       "preload.js",
