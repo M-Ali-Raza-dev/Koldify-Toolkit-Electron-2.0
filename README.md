@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v2.11.5</h1>
+  <h1>Koldify Toolkit (Electron) — v3.0.0</h1>
   <p><b>Apify + Inhouse + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-2.11.5-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-3.0.0-success">
   </p>
 </div>
 
@@ -28,7 +28,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 
 ## 🧰 Included Tools
 
-### Apify (LinkedIn / CSV pipeline)
+### Apify (Web & Platform Data Extraction)
 - **Post Finder** — find LinkedIn posts by keyword and export results
 - **Reaction Scraper** — scrape reactors from post URLs (CSV in → CSV out)
 - **Comment Scraper** — orchestrated comment scraping + export
@@ -37,8 +37,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **LinkedIn Profile Enhancer** — enhance/enrich profile records
 
 ### Inhouse Tools (CSV utilities)
-
-> New tools coming soon
+- **CSV Merger** — intelligently merge multiple CSV files with auto-detected column normalization (no duplicates)
 
 ### Blitz (enrichment)
 - **Email Enricher** — enrich emails via Blitz API
@@ -48,6 +47,8 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Find Mobile & Direct Phone** — get mobile/direct numbers from LinkedIn profile URLs (single/batch, CSV/TXT support)
 - **LinkedIn URL to Domain** — extract email domain from company LinkedIn URLs (single/batch, CSV/TXT support)
 - **Domain to LinkedIn** — find company LinkedIn URL from domain (single/batch, CSV/TXT support)
+- **Employee Finder** — find employees at companies with role/department filtering
+- **Current Date/Time** — get current date and time in any timezone
 - **Key Info** — check Blitz API key details, credits, rate limits, and allowed endpoints
 - **Employee Finder** — search employees by company LinkedIn URL with filters (region, level, function, connections)
   - New sample bundle: `samples/blitz/blitz-employee-finder/companies.csv`
