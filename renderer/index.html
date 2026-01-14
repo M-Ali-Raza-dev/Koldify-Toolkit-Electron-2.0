@@ -149,6 +149,14 @@
             </svg>
             LinkedIn URL to Domain
           </button>
+          <button class="nav-tab" data-tool="domain-to-linkedin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <path d="M2 12h20"/>
+            </svg>
+            Domain to LinkedIn
+          </button>
         </nav>
       </aside>
 
@@ -1697,6 +1705,127 @@
                 </button>
               </div>
               <pre class="console" id="console-find-mobile-direct-phone">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Domain to LinkedIn Tool Card -->
+        <div class="tool-card hidden" id="domain-to-linkedin" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">🌐</div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Domain to LinkedIn</h3>
+                <span class="badge badge-blitz">Blitz</span>
+              </div>
+              <p>Find company LinkedIn URL from domain using Blitz API</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input id="domain-linkedin-api-key" type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">Leave blank to use BLITZ_API_KEY env var</span>
+              </div>
+
+              <div class="form-field">
+                <label>Single Domain (optional)</label>
+                <input id="domain-linkedin-single-domain" type="text" class="input-field" placeholder="microsoft.com or https://microsoft.com">
+                <span class="hint">Provide one domain to test, or use file input below</span>
+              </div>
+
+              <div class="form-field">
+                <label>Input File (CSV or TXT)</label>
+                <div class="input-with-button">
+                  <input id="domain-linkedin-input-file" type="text" class="input-field" placeholder="Select CSV or TXT file" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="domain-linkedin-input-file"
+                    data-filters='[["CSV/TXT Files", ["csv", "txt"]], ["All Files", ["*"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">CSV must have a domain column (default: domain)</span>
+              </div>
+
+              <div class="form-field">
+                <label>Domain Column (for CSV)</label>
+                <input id="domain-linkedin-column-name" type="text" class="input-field" placeholder="domain" value="domain">
+              </div>
+
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input id="domain-linkedin-concurrency" type="number" class="input-field" placeholder="6" value="6" min="1" max="10">
+                <span class="hint">Parallel requests (1-10)</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="domain-linkedin-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="domain-linkedin-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Output filename (optional)</label>
+                <input id="domain-linkedin-output-file" type="text" class="input-field" placeholder="domain_to_linkedin_results.csv">
+                <span class="hint">Leave blank for auto-generated timestamp filename</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="domain-to-linkedin">
+                Run Domain to LinkedIn
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-domain-to-linkedin"
+              >
+                Sample input
+              </button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total Domains:</span>
+                <strong data-metric="domain-linkedin-total">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Processed:</span>
+                <strong data-metric="domain-linkedin-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Found:</span>
+                <strong data-metric="domain-linkedin-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Not Found:</span>
+                <strong data-metric="domain-linkedin-not-found">0</strong>
+              </div>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="domain-to-linkedin"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-domain-to-linkedin">Waiting for execution...</pre>
             </div>
           </div>
         </div>

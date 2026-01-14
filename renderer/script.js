@@ -255,6 +255,13 @@
         set('domain-not-found', metrics.domainsNotFound);
         break;
 
+      case 'domain-to-linkedin':
+        set('domain-linkedin-total', metrics.totalDomains);
+        set('domain-linkedin-processed', metrics.domainsProcessed);
+        set('domain-linkedin-found', metrics.urlsFound);
+        set('domain-linkedin-not-found', metrics.urlsNotFound);
+        break;
+
       default:
         break;
     }
@@ -916,6 +923,44 @@
         return {
           apiKey,
           singleCompany,
+          inputPath,
+          columnName,
+          concurrency,
+          outputDir,
+          outputFileName,
+        };
+      }
+
+      case 'domain-to-linkedin': {
+        const apiKeyInput = inputs[0];
+        const singleDomainInput = inputs[1];
+        const inputFileInput = inputs[2];
+        const columnNameInput = inputs[3];
+        const concurrencyInput = inputs[4];
+        const outputDirInput = inputs[5];
+        const outputFileInput = inputs[6];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const singleDomain = singleDomainInput?.value?.trim() || '';
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const columnName = columnNameInput?.value?.trim() || 'domain';
+        const concurrency = Number(concurrencyInput?.value || 6) || 6;
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputFileInput?.value?.trim() || '';
+
+        if (!singleDomain && !inputPath) {
+          alert('Please enter a domain OR select an input file (CSV/TXT)');
+          return null;
+        }
+
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
+        return {
+          apiKey,
+          singleDomain,
           inputPath,
           columnName,
           concurrency,
