@@ -1049,10 +1049,10 @@
 
       // -------- INHOUSE --------
       case 'merge-split': {
-        const inputDirInput = inputs[0];
-        const outputDirInput = inputs[1];
-        const chunkSizeInput = inputs[2];
-        const modeSelect = inputs[3];
+        const inputDirInput = document.getElementById('inhouse-merge-input-dir');
+        const outputDirInput = document.getElementById('inhouse-merge-output-dir');
+        const chunkSizeInput = document.getElementById('inhouse-merge-chunk-size');
+        const modeSelect = document.getElementById('inhouse-merge-mode');
 
         const inputDir = inputDirInput?.value?.trim() || '';
         const outputDir = outputDirInput?.value?.trim() || '';
@@ -1072,17 +1072,17 @@
       }
 
       case 'lead-merger': {
-        const inputDirInput = inputs[0];
-        const outputDirInput = inputs[1];
-        const outputFileInput = inputs[2];
+        const inputDirInput = document.getElementById('inhouse-lead-input-dir');
+        const outputDirInput = document.getElementById('inhouse-lead-output-dir');
+        const outputFileInput = document.getElementById('inhouse-lead-output-file');
 
         const inputDir = inputDirInput?.value?.trim() || '';
         const outputDir = outputDirInput?.value?.trim() || '';
         const outputFile = outputFileInput?.value?.trim() || 'merged.csv';
         
         // Get checkboxes separately
-        const dedupeCheckbox = document.getElementById('lead-merger-dedupe');
-        const normalizeCheckbox = document.getElementById('lead-merger-normalize');
+        const dedupeCheckbox = document.getElementById('inhouse-lead-dedupe');
+        const normalizeCheckbox = document.getElementById('inhouse-lead-normalize');
         const removeDuplicates = dedupeCheckbox?.checked !== false;
         const normalizeHeaders = normalizeCheckbox?.checked !== false;
 
