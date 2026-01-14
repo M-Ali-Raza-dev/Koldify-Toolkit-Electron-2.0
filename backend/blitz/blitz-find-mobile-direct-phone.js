@@ -192,23 +192,23 @@ async function blitzFindPhone(person_linkedin_url, apiKey, attempt = 1) {
 
 function flattenRow(person_linkedin_url, result) {
   const row = {
-    person_linkedin_url,
-    found: "",
-    phone: "",
-    error_status: "",
-    error_message: "",
+    "Person LinkedIn Url": person_linkedin_url,
+    "Found": "",
+    "Phone": "",
+    "Error Status": "",
+    "Error Message": "",
   };
 
   if (!result || result.ok === false) {
-    row.found = "false";
-    row.error_status = String(result?.status ?? "");
-    row.error_message = result?.data?.message || result?.data?.error || "Request failed";
+    row["Found"] = "false";
+    row["Error Status"] = String(result?.status ?? "");
+    row["Error Message"] = result?.data?.message || result?.data?.error || "Request failed";
     return row;
   }
 
   const data = result.data || {};
-  row.found = String(Boolean(data.found));
-  row.phone = data.phone ?? "";
+  row["Found"] = String(Boolean(data.found));
+  row["Phone"] = data.phone ?? "";
 
   return row;
 }
@@ -262,11 +262,11 @@ async function main() {
   fs.mkdirSync(outputDir, { recursive: true });
 
   const headers = [
-    "person_linkedin_url",
-    "found",
-    "phone",
-    "error_status",
-    "error_message",
+    "Person LinkedIn Url",
+    "Found",
+    "Phone",
+    "Error Status",
+    "Error Message",
   ];
 
   const results = new Array(urls.length);

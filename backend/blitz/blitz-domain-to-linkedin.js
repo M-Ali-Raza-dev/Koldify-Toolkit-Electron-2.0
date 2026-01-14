@@ -221,24 +221,24 @@ async function blitzDomainToLinkedin(domainInput, apiKey, attempt = 1) {
 
 function flattenRow(raw_domain, result) {
   const row = {
-    input_domain: raw_domain,
-    normalized_domain: normalizeDomain(raw_domain),
-    found: "",
-    company_linkedin_url: "",
-    error_status: "",
-    error_message: "",
+    "Input Domain": raw_domain,
+    "Normalized Domain": normalizeDomain(raw_domain),
+    "Found": "",
+    "Company LinkedIn Url": "",
+    "Error Status": "",
+    "Error Message": "",
   };
 
   if (!result || result.ok === false) {
-    row.found = "false";
-    row.error_status = String(result?.status ?? "");
-    row.error_message = result?.data?.message || result?.data?.error || "Request failed";
+    row["Found"] = "false";
+    row["Error Status"] = String(result?.status ?? "");
+    row["Error Message"] = result?.data?.message || result?.data?.error || "Request failed";
     return row;
   }
 
   const data = result.data || {};
-  row.found = String(Boolean(data.found));
-  row.company_linkedin_url = data.company_linkedin_url ?? "";
+  row["Found"] = String(Boolean(data.found));
+  row["Company LinkedIn Url"] = data.company_linkedin_url ?? "";
 
   return row;
 }
@@ -292,12 +292,12 @@ async function main() {
   fs.mkdirSync(outputDir, { recursive: true });
 
   const headers = [
-    "input_domain",
-    "normalized_domain",
-    "found",
-    "company_linkedin_url",
-    "error_status",
-    "error_message",
+    "Input Domain",
+    "Normalized Domain",
+    "Found",
+    "Company LinkedIn Url",
+    "Error Status",
+    "Error Message",
   ];
 
   const results = new Array(domains.length);
