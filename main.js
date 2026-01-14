@@ -188,6 +188,14 @@ const toolRegistry = {
       BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
     }),
   },
+
+  'blitz-employee-finder': {
+    script: unpackedPath('backend', 'blitz', 'blitz-employee-finder.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -214,6 +222,7 @@ const SAMPLE_DIRS = {
   'blitz-find-mobile-direct-phone': path.join('samples', 'blitz', 'blitz-find-mobile-direct-phone'),
   'blitz-linkedin-url-to-domain': path.join('samples', 'blitz', 'blitz-linkedin-url-to-domain'),
   'blitz-domain-to-linkedin': path.join('samples', 'blitz', 'blitz-domain-to-linkedin'),
+  'blitz-employee-finder': path.join('samples', 'blitz', 'blitz-employee-finder'),
 };
 
 // Recursively copy a directory (used for exporting samples)
