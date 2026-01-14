@@ -262,6 +262,13 @@
         set('domain-linkedin-not-found', metrics.urlsNotFound);
         break;
 
+      case 'blitz-employee-finder':
+        set('employee-input-rows', metrics.inputRows);
+        set('employee-output-rows', metrics.outputRows);
+        set('employee-clean-rows', metrics.cleanRows);
+        set('employee-issue-rows', metrics.issueRows);
+        break;
+
       default:
         break;
     }
