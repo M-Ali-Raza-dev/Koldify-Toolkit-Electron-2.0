@@ -129,6 +129,12 @@
             </svg>
             Reverse Phone
           </button>
+          <button class="nav-tab" data-tool="reverse-email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            Reverse Email
+          </button>
         </nav>
       </aside>
 
@@ -1411,6 +1417,151 @@
                 </button>
               </div>
               <pre class="console" id="console-reverse-phone">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reverse Email Tool Card -->
+        <div class="tool-card hidden" id="reverse-email" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">📧</div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Reverse Email → Person</h3>
+                <span class="badge badge-blitz">Blitz</span>
+              </div>
+              <p>Lookup person details from email addresses using Blitz API enrichment</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-grid">
+              <!-- API Key -->
+              <div class="form-field">
+                <label>Blitz API Key <span class="help-icon" title="Your Blitz API key for authentication">?</span></label>
+                <input id="reverse-email-api-key" type="password" class="input-field" placeholder="Enter your API key">
+                <div class="hint">Leave blank to use BLITZ_API_KEY env var</div>
+              </div>
+
+              <!-- Single Email -->
+              <div class="form-field">
+                <label>Single Email (Optional)</label>
+                <input id="reverse-email-single" type="text" class="input-field" placeholder="example@domain.com">
+                <div class="hint">Leave blank to use CSV/TXT file</div>
+              </div>
+
+              <!-- Input File -->
+              <div class="form-field" style="grid-column: 1 / -1;">
+                <label>Input File (CSV/TXT)</label>
+                <div class="input-with-button">
+                  <input id="reverse-email-input-file" type="text" class="input-field" placeholder="Select CSV or TXT file" readonly>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    data-role="pick-file"
+                    data-target="reverse-email-input-file"
+                    data-filters='[["CSV/TXT Files", ["csv", "txt"]], ["All Files", ["*"]]]'
+                  >
+                    Browse
+                  </button>
+                </div>
+                <div class="hint">CSV must have an "email" column (or specify column name below)</div>
+              </div>
+
+              <!-- Column Name -->
+              <div class="form-field">
+                <label>Email Column Name</label>
+                <input id="reverse-email-column-name" type="text" class="input-field" placeholder="email" value="email">
+                <div class="hint">Name of column containing emails in CSV</div>
+              </div>
+
+              <!-- Concurrency -->
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input id="reverse-email-concurrency" type="number" class="input-field" placeholder="4" value="4" min="1" max="10">
+                <div class="hint">Number of parallel workers (1-10)</div>
+              </div>
+
+              <!-- Output Directory -->
+              <div class="form-field">
+                <label>Output Directory</label>
+                <div class="input-with-button">
+                  <input id="reverse-email-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    data-role="pick-dir"
+                    data-target="reverse-email-output-dir"
+                  >
+                    Browse
+                  </button>
+                </div>
+              </div>
+
+              <!-- Output Filename -->
+              <div class="form-field">
+                <label>Output Filename</label>
+                <input id="reverse-email-output-file" type="text" class="input-field" placeholder="reverse_email_results.csv">
+                <div class="hint">Leave blank for auto-generated timestamp filename</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="reverse-email">
+                Run Reverse Email Lookup
+              </button>
+              <button
+                type="button"
+                class="btn-secondary"
+                data-role="export-sample"
+                data-sample-id="blitz-reverse-email"
+              >
+                Export Sample Files
+              </button>
+              <button
+                type="button"
+                class="btn-ghost"
+                data-role="stop-tool"
+                data-tool-id="reverse-email"
+              >
+                Stop
+              </button>
+            </div>
+
+            <!-- Status Metrics -->
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total:</span>
+                <strong data-metric="reverse-email-total">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Processed:</span>
+                <strong data-metric="reverse-email-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Found:</span>
+                <strong data-metric="reverse-email-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Not Found:</span>
+                <strong data-metric="reverse-email-not-found">0</strong>
+              </div>
+            </div>
+
+            <!-- Console/Log Output -->
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="reverse-email"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-reverse-email">Waiting for execution...</pre>
             </div>
           </div>
         </div>
