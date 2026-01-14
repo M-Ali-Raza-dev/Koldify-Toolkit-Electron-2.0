@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v2.0</h1>
+  <h1>Koldify Toolkit (Electron) — v2.6</h1>
   <p><b>Apify + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-2.6.0-success">
   </p>
 </div>
 
@@ -32,6 +32,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Post Finder** — find LinkedIn posts by keyword and export results
 - **Reaction Scraper** — scrape reactors from post URLs (CSV in → CSV out)
 - **Comment Scraper** — orchestrated comment scraping + export
+- **Contact Details Scraper** — extract contact information from LinkedIn profiles
 - **Merge / Split CSV** — combine and split datasets cleanly
 - **Lead Merger** — merge lead files into one normalized output
 - **Email Enricher** — extract/enrich emails using Apify flows
@@ -40,6 +41,9 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 ### Blitz (enrichment)
 - **Email Enricher** — enrich emails via Blitz API
 - **Waterfall ICP** — waterfall enrichment / ICP pipeline (status streaming supported)
+- **Reverse Email** — lookup person details from email addresses (single/batch, CSV/TXT support)
+- **Reverse Phone** — lookup person details from phone numbers (single/batch, CSV/TXT support)
+- **Find Mobile & Direct Phone** — get mobile/direct numbers from LinkedIn profile URLs (single/batch, CSV/TXT support)
 
 > The app streams logs and supports structured stdout formats like `::STATE:: {...}` for live status + metrics.
 

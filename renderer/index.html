@@ -135,6 +135,13 @@
             </svg>
             Reverse Email
           </button>
+          <button class="nav-tab" data-tool="find-mobile-direct-phone">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+              <path d="M12 18h.01"/>
+            </svg>
+            Find Mobile & Direct Phone
+          </button>
         </nav>
       </aside>
 
@@ -1562,6 +1569,127 @@
                 </button>
               </div>
               <pre class="console" id="console-reverse-email">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Find Mobile & Direct Phone Tool Card -->
+        <div class="tool-card hidden" id="find-mobile-direct-phone" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">📱</div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Find Mobile & Direct Phone</h3>
+                <span class="badge badge-blitz">Blitz</span>
+              </div>
+              <p>Lookup mobile/direct phone numbers from LinkedIn profile URLs using Blitz API</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input id="find-phone-api-key" type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">Leave blank to use BLITZ_API_KEY env var</span>
+              </div>
+
+              <div class="form-field">
+                <label>Single LinkedIn URL (optional)</label>
+                <input id="find-phone-single-url" type="text" class="input-field" placeholder="https://www.linkedin.com/in/example">
+                <span class="hint">Provide one URL to test, or use file input below</span>
+              </div>
+
+              <div class="form-field">
+                <label>Input File (CSV or TXT)</label>
+                <div class="input-with-button">
+                  <input id="find-phone-input-file" type="text" class="input-field" placeholder="Select CSV or TXT file" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="find-phone-input-file"
+                    data-filters='[["CSV/TXT Files", ["csv", "txt"]], ["All Files", ["*"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">CSV must have a LinkedIn URL column (default: person_linkedin_url)</span>
+              </div>
+
+              <div class="form-field">
+                <label>LinkedIn URL Column (for CSV)</label>
+                <input id="find-phone-column-name" type="text" class="input-field" placeholder="person_linkedin_url" value="person_linkedin_url">
+              </div>
+
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input id="find-phone-concurrency" type="number" class="input-field" placeholder="5" value="5" min="1" max="10">
+                <span class="hint">Parallel requests (1-10)</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="find-phone-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="find-phone-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Output filename (optional)</label>
+                <input id="find-phone-output-file" type="text" class="input-field" placeholder="find_mobile_direct_phone_results.csv">
+                <span class="hint">Leave blank for auto-generated timestamp filename</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="find-mobile-direct-phone">
+                Run Find Mobile & Direct Phone
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-find-mobile-direct-phone"
+              >
+                Sample input
+              </button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total URLs:</span>
+                <strong data-metric="find-phone-total">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Processed:</span>
+                <strong data-metric="find-phone-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Found:</span>
+                <strong data-metric="find-phone-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Not Found:</span>
+                <strong data-metric="find-phone-not-found">0</strong>
+              </div>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="find-mobile-direct-phone"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-find-mobile-direct-phone">Waiting for execution...</pre>
             </div>
           </div>
         </div>

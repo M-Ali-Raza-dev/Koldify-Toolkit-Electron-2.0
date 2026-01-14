@@ -157,6 +157,14 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'find-mobile-direct-phone': {
+    script: unpackedPath('backend', 'blitz', 'blitz-find-mobile-direct-phone.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -180,6 +188,7 @@ const SAMPLE_DIRS = {
   'blitz-waterfall-icp': path.join('samples', 'blitz', 'blitz-waterfall-icp'),
   'blitz-reverse-phone': path.join('samples', 'blitz', 'blitz-reverse-phone'),
   'blitz-reverse-email': path.join('samples', 'blitz', 'blitz-reverse-email'),
+  'blitz-find-mobile-direct-phone': path.join('samples', 'blitz', 'blitz-find-mobile-direct-phone'),
 };
 
 // Recursively copy a directory (used for exporting samples)
