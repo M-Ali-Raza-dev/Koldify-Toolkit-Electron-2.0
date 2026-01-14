@@ -329,7 +329,7 @@
       btn.addEventListener('click', () => handleSectionToggle(section));
     });
 
-    handleSectionToggle('apify');
+    handleSectionToggle('inhouse');
   }
 
   // ---------- SIDEBAR NAV TABS ----------
