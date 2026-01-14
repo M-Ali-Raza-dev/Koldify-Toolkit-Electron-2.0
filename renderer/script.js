@@ -969,6 +969,15 @@
         };
       }
 
+      case 'blitz-key-info': {
+        const apiKeyInput = inputs[0];
+        const apiKey = apiKeyInput?.value?.trim() || '';
+
+        return {
+          apiKey,
+        };
+      }
+
       default:
         return {};
     }
