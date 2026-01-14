@@ -88,14 +88,14 @@ const toolRegistry = {
   },
 
   'merge-split': {
-    script: unpackedPath('backend', 'apify', 'combined-merge-split.js'),
+    script: unpackedPath('backend', 'inhouse', 'combined-merge-split.js'),
     buildEnv: (payload) => ({
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
 
   'lead-merger': {
-    script: unpackedPath('backend', 'apify', 'csv-lead-merger.mjs'),
+    script: unpackedPath('backend', 'inhouse', 'csv-lead-merger.mjs'),
     buildEnv: (payload) => ({
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
@@ -217,10 +217,12 @@ const SAMPLE_DIRS = {
   'apify-post-finder': path.join('samples', 'apify', 'post-finder'),
   'apify-post-reaction': path.join('samples', 'apify', 'post-reaction'),
   'apify-email-extractor': path.join('samples', 'apify', 'email-extractor'),
-  'apify-combined-merge-split': path.join('samples', 'apify', 'combined-merge-split'),
-  'apify-csv-lead-merger': path.join('samples', 'apify', 'csv-lead-merger'),
   'linkedin-profile-enhancer': path.join('samples', 'apify', 'linkedin-profile-enhancer'),
   'apify-contact-details-scraper': path.join('samples', 'apify', 'contact-details-scraper'),
+
+  // INHOUSE
+  'inhouse-combined-merge-split': path.join('samples', 'inhouse', 'combined-merge-split'),
+  'inhouse-csv-lead-merger': path.join('samples', 'inhouse', 'csv-lead-merger'),
 
   // BLITZ
   'blitz-email-enricher': path.join('samples', 'blitz', 'blitz-email-enricher'),

@@ -1,7 +1,7 @@
 {
   "name": "koldify-toolkit-electron",
-  "version": "2.11.0",
-  "description": "Koldify Toolkit – Apify + Blitz Automation Desktop App",
+  "version": "2.11.2",
+  "description": "Koldify Toolkit – Apify + Inhouse + Blitz Automation Desktop App",
   "main": "main.js",
   "author": "Koldify",
   "license": "ISC",

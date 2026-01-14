@@ -41,6 +41,12 @@
         </svg>
         Apify
       </button>
+      <button class="toggle-btn" data-section="inhouse">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Inhouse Tools
+      </button>
       <button class="toggle-btn" data-section="blitz">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
@@ -68,24 +74,6 @@
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             Reaction Scraper
-          </button>
-          <button class="nav-tab" data-tool="merge-split">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
-            </svg>
-            Merge / Split CSV
-          </button>
-          <button class="nav-tab" data-tool="lead-merger">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
-            </svg>
-            Lead Merger
-          </button>
-          <button class="nav-tab" data-tool="comment-scraper">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            Comment Scraper
           </button>
           <button class="nav-tab" data-tool="apify-email-enricher">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -179,6 +167,24 @@
               <polyline points="12 6 12 12 16 14"/>
             </svg>
             Current Date/Time
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Inhouse Tools Sidebar -->
+      <aside class="sidebar hidden" id="inhouse-sidebar">
+        <nav class="sidebar-nav">
+          <button class="nav-tab active" data-tool="merge-split">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+            </svg>
+            Merge / Split CSV
+          </button>
+          <button class="nav-tab" data-tool="lead-merger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+            </svg>
+            Lead Merger
           </button>
         </nav>
       </aside>
@@ -2179,6 +2185,131 @@
                 </button>
               </div>
               <pre class="console" id="console-blitz-current-date">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- INHOUSE TOOLS -->
+
+        <!-- Merge / Split CSV -->
+        <div class="tool-card hidden" id="merge-split" data-section="inhouse">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Merge / Split CSV</h3>
+                <span class="badge badge-inhouse">Inhouse</span>
+                <button class="help-icon" type="button" title="Merge multiple CSV files, deduplicate, and split into chunks.">?</button>
+              </div>
+              <p>Merge multiple CSV files, deduplicate, and split into configurable chunks</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input directory</label>
+                <div class="input-with-button">
+                  <input type="text" class="input-field" placeholder="./input">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target-input="0">Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output directory</label>
+                <div class="input-with-button">
+                  <input type="text" class="input-field" placeholder="./output">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target-input="1">Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Chunk size (rows)</label>
+                <input type="number" class="input-field" value="5000">
+              </div>
+              <div class="form-field">
+                <label>Mode</label>
+                <select class="input-field">
+                  <option value="merge-split">Merge & Split</option>
+                  <option value="merge-only">Merge Only</option>
+                  <option value="split-only">Split Only</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="merge-split">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
+                </svg>
+                Run Merge / Split
+              </button>
+              <button type="button" class="btn-secondary small" data-role="view-sample" data-tool-id="merge-split">
+                📂 View Sample
+              </button>
+            </div>
+            <div class="card-footer">
+              <pre class="console" id="console-merge-split">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lead Merger -->
+        <div class="tool-card hidden" id="lead-merger" data-section="inhouse">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Lead Merger</h3>
+                <span class="badge badge-inhouse">Inhouse</span>
+                <button class="help-icon" type="button" title="Merge CSV lead files with header normalization and deduplication.">?</button>
+              </div>
+              <p>Merge multiple lead CSV files with flexible header matching and deduplication</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input directory</label>
+                <div class="input-with-button">
+                  <input type="text" class="input-field" placeholder="./leads-input">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target-input="0">Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output directory</label>
+                <div class="input-with-button">
+                  <input type="text" class="input-field" placeholder="./leads-output">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target-input="1">Browse</button>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Output filename</label>
+                <input type="text" class="input-field" value="merged.csv" placeholder="merged.csv">
+              </div>
+              <div class="form-field checkbox-field">
+                <input type="checkbox" id="lead-merger-dedupe" checked>
+                <label for="lead-merger-dedupe">Remove duplicates by email</label>
+              </div>
+              <div class="form-field checkbox-field">
+                <input type="checkbox" id="lead-merger-normalize" checked>
+                <label for="lead-merger-normalize">Normalize headers</label>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="lead-merger">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+                </svg>
+                Run Lead Merger
+              </button>
+            </div>
+            <div class="card-footer">
+              <pre class="console" id="console-lead-merger">Waiting for execution...</pre>
             </div>
           </div>
         </div>

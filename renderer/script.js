@@ -8,6 +8,7 @@
   const toggleButtons = document.querySelectorAll('.toggle-btn');
   const apifySidebar = document.getElementById('apify-sidebar');
   const blitzSidebar = document.getElementById('blitz-sidebar');
+  const inhouseSidebar = document.getElementById('inhouse-sidebar');
 
   const blitzUrlSelect = document.getElementById('blitz-email-url-column');
   const blitzInputFile = document.getElementById('blitz-email-input-file');
@@ -274,7 +275,7 @@
     }
   }
 
-  // ---------- SECTION TOGGLE (Apify / Blitz) ----------
+  // ---------- SECTION TOGGLE (Apify / Inhouse / Blitz) ----------
   function handleSectionToggle(section) {
     toggleButtons.forEach((btn) => {
       const btnSection = btn.getAttribute('data-section');
@@ -288,6 +289,9 @@
     if (apifySidebar) {
       apifySidebar.classList.toggle('hidden', section !== 'apify');
     }
+    if (inhouseSidebar) {
+      inhouseSidebar.classList.toggle('hidden', section !== 'inhouse');
+    }
     if (blitzSidebar) {
       blitzSidebar.classList.toggle('hidden', section !== 'blitz');
     }
@@ -298,11 +302,16 @@
         apifySidebar.querySelector('.nav-tab.active') ||
         apifySidebar.querySelector('.nav-tab[data-tool]');
       activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'post-finder';
+    } else if (section === 'inhouse' && inhouseSidebar) {
+      const activeTab =
+        inhouseSidebar.querySelector('.nav-tab.active') ||
+        inhouseSidebar.querySelector('.nav-tab[data-tool]');
+      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'merge-split';
     } else if (section === 'blitz' && blitzSidebar) {
       const activeTab =
         blitzSidebar.querySelector('.nav-tab.active') ||
         blitzSidebar.querySelector('.nav-tab[data-tool]');
-      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'email-enricher';
+      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'blitz-key-info';
     }
 
     toolCards.forEach((card) => {
@@ -337,8 +346,13 @@
     navTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const toolId = tab.getAttribute('data-tool');
-        const section =
-          tab.closest('.sidebar')?.id === 'blitz-sidebar' ? 'blitz' : 'apify';
+        let section = 'apify';
+        const sidebarId = tab.closest('.sidebar')?.id;
+        if (sidebarId === 'blitz-sidebar') {
+          section = 'blitz';
+        } else if (sidebarId === 'inhouse-sidebar') {
+          section = 'inhouse';
+        }
 
         const siblingTabs = tab.closest('.sidebar')?.querySelectorAll('.nav-tab') || [];
         siblingTabs.forEach((t) => t.classList.remove('active'));
@@ -1031,6 +1045,57 @@
           apiKey,
           region,
         };
+      }
+
+      // -------- INHOUSE --------
+      case 'merge-split': {
+        const inputDirInput = inputs[0];
+        const outputDirInput = inputs[1];
+        const chunkSizeInput = inputs[2];
+        const modeSelect = inputs[3];
+
+        const inputDir = inputDirInput?.value?.trim() || '';
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const chunkSize = Number(chunkSizeInput?.value || 5000) || 5000;
+        const mode = modeSelect?.value || 'merge-split';
+
+        if (!inputDir) {
+          alert('Please enter an input directory');
+          return null;
+        }
+        if (!outputDir) {
+          alert('Please enter an output directory');
+          return null;
+        }
+
+        return { inputDir, outputDir, chunkSize, mode };
+      }
+
+      case 'lead-merger': {
+        const inputDirInput = inputs[0];
+        const outputDirInput = inputs[1];
+        const outputFileInput = inputs[2];
+
+        const inputDir = inputDirInput?.value?.trim() || '';
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFile = outputFileInput?.value?.trim() || 'merged.csv';
+        
+        // Get checkboxes separately
+        const dedupeCheckbox = document.getElementById('lead-merger-dedupe');
+        const normalizeCheckbox = document.getElementById('lead-merger-normalize');
+        const removeDuplicates = dedupeCheckbox?.checked !== false;
+        const normalizeHeaders = normalizeCheckbox?.checked !== false;
+
+        if (!inputDir) {
+          alert('Please enter an input directory');
+          return null;
+        }
+        if (!outputDir) {
+          alert('Please enter an output directory');
+          return null;
+        }
+
+        return { inputDir, outputDir, outputFile, removeDuplicates, normalizeHeaders };
       }
 
       default:
