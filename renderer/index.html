@@ -1168,33 +1168,75 @@
             <div class="form-grid">
               <div class="form-field">
                 <label>Blitz API Key</label>
-                <input type="password" class="input-field" placeholder="blitz_************************">
+                <input id="waterfall-api-key" type="password" class="input-field" placeholder="blitz_************************">
                 <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
               </div>
+
               <div class="form-field">
                 <label>Companies CSV</label>
-                <input type="file" accept=".csv" class="input-field file-input">
+                <div class="input-with-button">
+                  <input id="waterfall-companies-csv" type="text" class="input-field" placeholder="Select companies CSV" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="waterfall-companies-csv"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
+                  >Choose File</button>
+                </div>
                 <span class="hint">Must contain column 'company_linkedin_url'</span>
               </div>
+
               <div class="form-field">
                 <label>Include titles CSV</label>
-                <input type="file" accept=".csv" class="input-field file-input">
+                <div class="input-with-button">
+                  <input id="waterfall-include-titles-csv" type="text" class="input-field" placeholder="Select include titles CSV" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="waterfall-include-titles-csv"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
+                  >Choose File</button>
+                </div>
                 <span class="hint">First non-empty column per row is used (e.g., ceo, founder)</span>
               </div>
+
               <div class="form-field">
                 <label>Exclude titles CSV (optional)</label>
-                <input type="file" accept=".csv" class="input-field file-input">
+                <div class="input-with-button">
+                  <input id="waterfall-exclude-titles-csv" type="text" class="input-field" placeholder="Select exclude titles CSV" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="waterfall-exclude-titles-csv"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
+                  >Choose File</button>
+                </div>
                 <span class="hint">Filter out unwanted roles (intern, assistant, etc.)</span>
               </div>
+
               <div class="form-field">
                 <label>Locations CSV (optional)</label>
-                <input type="file" accept=".csv" class="input-field file-input">
+                <div class="input-with-button">
+                  <input id="waterfall-locations-csv" type="text" class="input-field" placeholder="Select locations CSV" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="waterfall-locations-csv"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
+                  >Choose File</button>
+                </div>
                 <span class="hint">2-letter country codes (US, UK, DE, …)</span>
               </div>
+
               <div class="form-field">
                 <label>Max results per company</label>
-                <input type="number" class="input-field" value="10">
+                <input id="waterfall-max-results" type="number" class="input-field" value="10">
               </div>
+
               <div class="form-field">
                 <label>Output folder</label>
                 <div class="input-with-button">
@@ -1207,9 +1249,10 @@
                   >Browse</button>
                 </div>
               </div>
+
               <div class="form-field">
                 <label>Output CSV file</label>
-                <input type="text" class="input-field" placeholder="blitz_icp_results.csv">
+                <input id="waterfall-output-file" type="text" class="input-field" placeholder="blitz_icp_results.csv" value="blitz_icp_results.csv">
               </div>
             </div>
             <div class="btn-row">

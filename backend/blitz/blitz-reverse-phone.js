@@ -30,11 +30,9 @@ let stopRequested = false;
 
 function handleStopSignal(signal) {
   console.log("");
-  console.log("=".repeat(80));
-  console.log(`[STOP] Signal ${signal} received by blitz-reverse-phone.`);
-  console.log("[STOP] Will NOT start new rows after the current one finishes.");
-  console.log("[STOP] Current Blitz request (if any) will finish, then stop cleanly.");
-  console.log("=".repeat(80));
+  ui.divider();
+  ui.warn(`Stop requested (${signal}). Finishing current request, then stopping cleanly...`);
+  ui.divider();
   stopRequested = true;
 }
 
@@ -79,24 +77,148 @@ function getConfig() {
     columnName: config.columnName || getArg("--column", "phone"),
     outputDir: config.outputDir || getArg("--output-dir", "./output"),
     concurrency: parseInt(config.concurrency || getArg("--concurrency", "3"), 10),
+    jsonLogs: Boolean(config.jsonLogs) || hasFlag("--json") || process.env.JSON_LOGS === "1",
   };
 }
 
-// --- Logging (structured + readable) ---
+/* ========================
+ * PRETTY CONSOLE UI
+ * ======================*/
+const ui = {
+  divider() {
+    console.log("─".repeat(60));
+  },
+  title(t) {
+    console.log("\n" + "─".repeat(60));
+    console.log(`📞 ${t}`);
+    console.log("─".repeat(60));
+  },
+  section(t) {
+    console.log("\n" + "─".repeat(60));
+    console.log(`🧩 ${t}`);
+    console.log("─".repeat(60));
+  },
+  info(msg) {
+    console.log(`ℹ ${msg}`);
+  },
+  ok(msg) {
+    console.log(`✓ ${msg}`);
+  },
+  warn(msg) {
+    console.log(`⚠️  ${msg}`);
+  },
+  err(msg) {
+    console.log(`✖ ${msg}`);
+  },
+  worker(workerId, phone, i, total) {
+    console.log(`👤 Worker #${workerId}  →  ${formatPhone(phone)}  (${i} / ${total})`);
+  },
+  requestOk(phone, ms, status = 200) {
+    console.log(`✅ ${formatPhone(phone)}  • ${status} OK  • ${msToS(ms)}s`);
+  },
+  retry(phone, status, attempt, backoff) {
+    console.log(`⚠️  ${formatPhone(phone)}  • ${status} • retry #${attempt} in ${Math.round(backoff / 100) / 10}s`);
+  },
+  doneSummary({ processed, total, found, notFound, outPath, stoppedEarly }) {
+    this.section("Run Summary");
+    this.ok(`Processed : ${processed} / ${total}${stoppedEarly ? " (stopped early)" : ""}`);
+    this.ok(`Found     : ${found}`);
+    this.ok(`No match  : ${notFound}`);
+    console.log("");
+    console.log(`📁 Saved CSV:\n${outPath}`);
+    console.log("");
+    this.ok("Tool finished.");
+    this.divider();
+  },
+};
+
+function msToS(ms) {
+  return (ms / 1000).toFixed(2);
+}
+
+// Keep phone readable without trying to be “too smart”
+function formatPhone(p) {
+  const s = String(p || "").trim();
+  return s;
+}
+
+/* ========================
+ * LOGGING
+ * - Keep emitStatus() JSON for Electron parsing
+ * - Make normal logs pretty by default
+ * - Allow --json to get old JSON logs
+ * ======================*/
 function nowISO() {
   return new Date().toISOString();
 }
-function log(level, msg, meta = {}) {
-  const line = {
-    ts: nowISO(),
-    level,
-    msg,
-    ...meta,
-  };
-  console.log(JSON.stringify(line));
+
+function log(config, level, msg, meta = {}) {
+  // If jsonLogs is enabled, keep previous behavior
+  if (config.jsonLogs) {
+    const line = { ts: nowISO(), level, msg, ...meta };
+    console.log(JSON.stringify(line));
+    return;
+  }
+
+  // Pretty output
+  if (level === "info") {
+    // Keep your “Starting run” as a nice header
+    if (msg === "Starting run") {
+      ui.title("Reverse Phone → Person Lookup");
+      ui.ok(`Tool started • Concurrency: ${meta.concurrency}`);
+      ui.ok(`Total phones • ${meta.total_phones}`);
+      ui.ok(`Output dir   • ${meta.output_dir}`);
+      return;
+    }
+
+    if (msg === "Worker processing") {
+      ui.worker(meta.workerId, meta.phone, meta.i, meta.total_phones ?? meta.totalPhones ?? "?");
+      return;
+    }
+
+    if (msg === "Request ok") {
+      ui.requestOk(meta.phone, meta.duration_ms, meta.status);
+      return;
+    }
+
+    if (msg === "Worker stopping") {
+      ui.warn(`Worker #${meta.workerId} stopping (stop requested)`);
+      return;
+    }
+
+    if (msg === "Done") {
+      // We'll show summary later in main(), so keep this quiet.
+      return;
+    }
+
+    ui.info(msg);
+    return;
+  }
+
+  if (level === "warn") {
+    if (msg === "Request failed; retrying") {
+      ui.retry(meta.phone, meta.status, meta.attempt, meta.backoff_ms);
+      return;
+    }
+    if (msg === "Run stopped early") {
+      ui.warn(`Stopped early • processed ${meta.processed}/${meta.total}`);
+      return;
+    }
+    ui.warn(msg);
+    return;
+  }
+
+  // error
+  ui.err(`${msg}${meta?.phone ? ` • ${formatPhone(meta.phone)}` : ""}`);
+  if (meta?.status) ui.err(`Status: ${meta.status}`);
+  if (meta?.response_preview) ui.err(`Response: ${meta.response_preview}`);
+  if (meta?.error) ui.err(`Error: ${meta.error}`);
 }
 
-// --- Status/Metrics output for Electron UI ---
+/* ========================
+ * Status/Metrics output for Electron UI
+ * (DO NOT CHANGE THIS FORMAT)
+ * ======================*/
 function emitStatus(phase = "running", extra = {}) {
   const {
     totalPhones = null,
@@ -199,7 +321,7 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function blitzPhoneToPerson(phone, apiKey, attempt = 1) {
+async function blitzPhoneToPerson(phone, apiKey, attempt = 1, configForLog) {
   const t0 = Date.now();
 
   const res = await fetch(API_URL, {
@@ -225,21 +347,20 @@ async function blitzPhoneToPerson(phone, apiKey, attempt = 1) {
   if (!res.ok) {
     const status = res.status;
 
-    // Backoff rules
     const shouldRetry = status === 429 || status >= 500;
     if (shouldRetry && attempt < 5) {
       const backoff = Math.min(15000, 750 * Math.pow(2, attempt)); // 1500, 3000, 6000...
-      log("warn", "Request failed; retrying", {
+      log(configForLog, "warn", "Request failed; retrying", {
         phone,
         status,
         attempt,
         backoff_ms: backoff,
       });
       await sleep(backoff);
-      return blitzPhoneToPerson(phone, apiKey, attempt + 1);
+      return blitzPhoneToPerson(phone, apiKey, attempt + 1, configForLog);
     }
 
-    log("error", "Request failed (no more retries)", {
+    log(configForLog, "error", "Request failed (no more retries)", {
       phone,
       status,
       attempt,
@@ -247,25 +368,12 @@ async function blitzPhoneToPerson(phone, apiKey, attempt = 1) {
       response_preview: String(text).slice(0, 300),
     });
 
-    // return a normalized failure row
-    return {
-      ok: false,
-      phone,
-      status,
-      duration_ms: ms,
-      data,
-    };
+    return { ok: false, phone, status, duration_ms: ms, data };
   }
 
-  log("info", "Request ok", { phone, status: res.status, duration_ms: ms });
+  log(configForLog, "info", "Request ok", { phone, status: res.status, duration_ms: ms });
 
-  return {
-    ok: true,
-    phone,
-    status: res.status,
-    duration_ms: ms,
-    data,
-  };
+  return { ok: true, phone, status: res.status, duration_ms: ms, data };
 }
 
 // --- Flatten Blitz response into CSV row ---
@@ -307,7 +415,6 @@ function flattenResult(phone, result) {
   const data = result.data || {};
   base["Found"] = String(Boolean(data.found));
 
-  // Your sample has: data.person.person.{...}
   const p = data?.person?.person || data?.person || {};
 
   base["First Name"] = p.first_name ?? "";
@@ -325,7 +432,6 @@ function flattenResult(phone, result) {
   base["Location State Code"] = loc.state_code ?? "";
   base["Location Country Code"] = loc.country_code ?? "";
 
-  // Take first experience as "current" if present
   const exp = Array.isArray(p.experiences) && p.experiences.length ? p.experiences[0] : null;
   if (exp) {
     base["Current Job Title"] = exp.job_title ?? "";
@@ -346,13 +452,10 @@ async function main() {
   const { apiKey, singlePhone, inputPath, columnName, outputDir, concurrency } = config;
 
   if (!apiKey) {
-    console.error(
-      "Missing API key. Set env var BLITZ_API_KEY or pass --apiKey \"...\""
-    );
+    console.error('Missing API key. Set env var BLITZ_API_KEY or pass --apiKey "..."');
     process.exit(1);
   }
 
-  // Ensure output dir exists
   fs.mkdirSync(outputDir, { recursive: true });
 
   // Collect phones
@@ -367,37 +470,31 @@ async function main() {
     if (ext === ".csv") {
       const parsed = parseCSV(raw);
       if (!parsed.headers.includes(columnName)) {
-        console.error(
-          `CSV missing column "${columnName}". Found columns: ${parsed.headers.join(
-            ", "
-          )}`
-        );
+        console.error(`CSV missing column "${columnName}". Found columns: ${parsed.headers.join(", ")}`);
         process.exit(1);
       }
-      phones = parsed.rows
-        .map((r) => (r[columnName] || "").trim())
-        .filter(Boolean);
+      phones = parsed.rows.map((r) => (r[columnName] || "").trim()).filter(Boolean);
     } else {
-      // .txt, .note, etc
       phones = extractPhonesFromTxt(raw);
     }
   } else {
-    console.error(
-      'Provide either --phone "+123..." OR --input "file.csv/.txt"'
-    );
+    console.error('Provide either --phone "+123..." OR --input "file.csv/.txt"');
     process.exit(1);
   }
 
   // Basic cleanup + de-dupe
   phones = Array.from(new Set(phones.map((p) => p.trim()).filter(Boolean)));
 
-  log("info", "Starting run", {
+  // Starting log
+  log(config, "info", "Starting run", {
     total_phones: phones.length,
     concurrency,
     output_dir: outputDir,
   });
 
-  // Emit initial status
+  ui.section("Processing Phones");
+
+  // Emit initial status (Electron)
   emitStatus("running", {
     totalPhones: phones.length,
     phonesProcessed: 0,
@@ -438,9 +535,8 @@ async function main() {
 
   async function worker(workerId) {
     while (true) {
-      // Check for stop
       if (stopRequested || softStopRequested()) {
-        log("info", "Worker stopping", { workerId });
+        log(config, "info", "Worker stopping", { workerId });
         return;
       }
 
@@ -448,21 +544,23 @@ async function main() {
       if (myIndex >= phones.length) return;
 
       const phone = phones[myIndex];
-      log("info", "Worker processing", { workerId, phone, i: myIndex + 1 });
+
+      // Pretty worker line (and JSON if --json)
+      if (config.jsonLogs) {
+        log(config, "info", "Worker processing", { workerId, phone, i: myIndex + 1 });
+      } else {
+        ui.worker(workerId, phone, myIndex + 1, phones.length);
+      }
 
       try {
-        const res = await blitzPhoneToPerson(phone, apiKey);
+        const res = await blitzPhoneToPerson(phone, apiKey, 1, config);
         results[myIndex] = flattenResult(phone, res);
-        
-        // Update counters
-        processedCount++;
-        if (results[myIndex]["Found"] === "true") {
-          foundCount++;
-        } else {
-          notFoundCount++;
-        }
 
-        // Emit status every 5 processed or at key milestones
+        processedCount++;
+        if (results[myIndex]["Found"] === "true") foundCount++;
+        else notFoundCount++;
+
+        // Emit status every 5 processed or at end
         if (processedCount % 5 === 0 || processedCount === phones.length) {
           emitStatus("running", {
             totalPhones: phones.length,
@@ -472,16 +570,18 @@ async function main() {
           });
         }
       } catch (e) {
-        log("error", "Unhandled exception", {
+        log(config, "error", "Unhandled exception", {
           workerId,
           phone,
           error: e?.message || String(e),
         });
+
         results[myIndex] = flattenResult(phone, {
           ok: false,
           status: "",
           data: { message: e?.message || String(e) },
         });
+
         processedCount++;
         notFoundCount++;
       }
@@ -500,10 +600,11 @@ async function main() {
     phonesNotFound: notFoundCount,
   });
 
-  // Check if stopped early
-  if (stopRequested || softStopRequested()) {
-    log("warn", "Run stopped early", {
-      processed: results.filter(r => r).length,
+  // Stopped early?
+  const stoppedEarly = stopRequested || softStopRequested();
+  if (stoppedEarly) {
+    log(config, "warn", "Run stopped early", {
+      processed: results.filter((r) => r).length,
       total: phones.length,
     });
   }
@@ -514,19 +615,28 @@ async function main() {
     .replace(/[:.]/g, "-")
     .replace("T", "_")
     .replace("Z", "");
-  const outPath = path.join(outputDir, `reverse_phone_to_person_${stamp}.csv`);
 
-  const csv = toCSV(headers, results.filter(r => r)); // Only write completed results
+  const outPath = path.join(outputDir, `reverse_phone_to_person_${stamp}.csv`);
+  const csv = toCSV(headers, results.filter((r) => r));
   fs.writeFileSync(outPath, csv, "utf8");
 
-  log("info", "Done", {
+  // End log (json mode still gets your structured "Done")
+  log(config, "info", "Done", {
     output_file: outPath,
     total: phones.length,
     found_true: foundCount,
     found_false: notFoundCount,
   });
 
-  console.log("\nSaved CSV:\n" + outPath);
+  // Pretty summary (even if json mode, it's fine)
+  ui.doneSummary({
+    processed: processedCount,
+    total: phones.length,
+    found: foundCount,
+    notFound: notFoundCount,
+    outPath,
+    stoppedEarly,
+  });
 }
 
 main().catch((e) => {

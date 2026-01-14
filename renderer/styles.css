@@ -121,21 +121,25 @@ body {
   box-shadow: var(--glow-primary);
 }
 
+/* ✅ FIX: Sidebar + Tool alignment (THIS IS THE IMPORTANT PART) */
 .content-wrapper {
   display: flex;
   gap: 1rem;
+  align-items: flex-start; /* prevents weird vertical stretch/centering */
 }
 
 /* Sidebar */
 .sidebar {
   width: 16rem;
-  flex-shrink: 0;
+  flex: 0 0 16rem;
+  align-self: flex-start;  /* lock sidebar to top */
   background: hsl(222, 47%, 7%);
   border-right: 1px solid var(--border);
   padding: 1rem;
   border-radius: var(--radius);
 }
 
+/* Sidebar nav */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -172,12 +176,17 @@ body {
 
 /* Tool Container */
 .tool-container {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  display: flex;              /* force a real layout column */
+  flex-direction: column;
+  align-items: stretch;        /* cards fill the width */
 }
 
 /* Tool Card */
 .tool-card {
+  width: 100%;                 /* force full width so it never "floats/centers" */
+  margin: 0;                   /* kill any accidental centering */
   background: linear-gradient(135deg, hsl(222, 47%, 10%) 0%, hsl(222, 47%, 8%) 100%);
   border-radius: var(--radius);
   border: 1px solid var(--border);
@@ -186,14 +195,8 @@ body {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .card-header {
@@ -349,6 +352,18 @@ body {
 .hint {
   font-size: 0.75rem;
   color: var(--muted-foreground);
+}
+
+/* Input + Button Container */
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-with-button input {
+  flex: 1;
+  min-width: 0;
 }
 
 select.input-field {
@@ -867,19 +882,13 @@ select.input-field {
   pointer-events: auto;
 }
 
-/* Flatten the multiselect when placed inside a card to avoid double-inset look */
-.card .ms-btn {
+/* Flatten multiselect if used inside cards (safe) */
+.tool-card .ms-btn {
   background: transparent;
   border-color: rgba(255,255,255,0.08);
   padding: 0.25rem 0.5rem;
 }
-.card .ms-menu {
-  left: 0;
-  right: 0;
-}
-.card .ms-actions .icon-btn {
-  border-color: rgba(255,255,255,0.08);
-}
+.tool-card .ms-actions .icon-btn { border-color: rgba(255,255,255,0.08); }
 
 .ms-search {
   padding: 0.75rem;
