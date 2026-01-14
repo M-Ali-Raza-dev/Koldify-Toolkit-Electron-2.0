@@ -190,6 +190,14 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  // ---------- INHOUSE TOOLS ----------
+  'csv-merger': {
+    script: unpackedPath('backend', 'inhouse', 'csv-merger.js'),
+    buildEnv: (payload) => ({
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -215,6 +223,9 @@ const SAMPLE_DIRS = {
   'blitz-linkedin-url-to-domain': path.join('samples', 'blitz', 'blitz-linkedin-url-to-domain'),
   'blitz-domain-to-linkedin': path.join('samples', 'blitz', 'blitz-domain-to-linkedin'),
   'blitz-employee-finder': path.join('samples', 'blitz', 'blitz-employee-finder'),
+
+  // INHOUSE
+  'inhouse-csv-merger': path.join('samples', 'inhouse', 'csv-merger'),
 };
 
 // Recursively copy a directory (used for exporting samples)

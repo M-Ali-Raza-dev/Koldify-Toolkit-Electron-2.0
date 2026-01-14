@@ -176,7 +176,14 @@
       <!-- Inhouse Tools Sidebar -->
       <aside class="sidebar" id="inhouse-sidebar">
         <nav class="sidebar-nav">
-          <!-- Tools to be added -->
+          <button class="nav-tab active" data-tool="csv-merger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            CSV Merger
+          </button>
         </nav>
       </aside>
 
@@ -1984,6 +1991,109 @@
         </div>
 
         <!-- INHOUSE TOOLS -->
+
+        <!-- CSV Merger -->
+        <div class="tool-card" id="csv-merger" data-section="inhouse">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>CSV Merger</h3>
+                <span class="badge badge-inhouse" style="background: rgba(124, 58, 237, 0.15); color: rgba(167, 139, 250, 0.95);">In-House</span>
+                <button class="help-icon" type="button" title="Merge multiple CSV files with auto-detected columns into one unified file.">?</button>
+              </div>
+              <p>Intelligently merge multiple CSV files with automatic column detection and normalization</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input Folder</label>
+                <div class="input-with-button">
+                  <input id="csv-merger-input-dir" type="text" class="input-field" placeholder="Select folder containing CSV files">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="csv-merger-input-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Folder with multiple CSV files to merge</span>
+              </div>
+              <div class="form-field">
+                <label>Output Folder</label>
+                <div class="input-with-button">
+                  <input id="csv-merger-output-dir" type="text" class="input-field" placeholder="Select output folder (default: same as input)">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="csv-merger-output-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Where to save the merged file (leave empty to use input folder)</span>
+              </div>
+              <div class="form-field">
+                <label>Output Filename</label>
+                <input id="csv-merger-output-name" type="text" class="input-field" value="merged.csv" placeholder="merged.csv">
+                <span class="hint">Name for the merged CSV file</span>
+              </div>
+              <div class="form-field">
+                <label>Log Filename</label>
+                <input id="csv-merger-log-name" type="text" class="input-field" value="merger-log.jsonl" placeholder="merger-log.jsonl">
+                <span class="hint">JSONL log file for detailed processing info</span>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="csv-merger">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+                Merge CSV Files
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="inhouse-csv-merger"
+              >
+                Sample files
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Files Merged:</span>
+                <strong data-metric="csv-merger-files">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Total Rows:</span>
+                <strong data-metric="csv-merger-rows">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Columns:</span>
+                <strong data-metric="csv-merger-columns">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="csv-merger"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-csv-merger">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>

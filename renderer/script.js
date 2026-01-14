@@ -259,6 +259,13 @@
         set('employee-issue-rows', metrics.issueRows);
         break;
 
+      // INHOUSE
+      case 'csv-merger':
+        set('csv-merger-files', metrics['csv-merger-files']);
+        set('csv-merger-rows', metrics['csv-merger-rows']);
+        set('csv-merger-columns', metrics['csv-merger-columns']);
+        break;
+
       default:
         break;
     }
@@ -1010,6 +1017,31 @@
         return {
           apiKey,
           region,
+        };
+      }
+
+      // -------- INHOUSE --------
+      case 'csv-merger': {
+        const inputDirInput = document.getElementById('csv-merger-input-dir');
+        const outputDirInput = document.getElementById('csv-merger-output-dir');
+        const outputNameInput = document.getElementById('csv-merger-output-name');
+        const logNameInput = document.getElementById('csv-merger-log-name');
+
+        const inputDir = inputDirInput?.value?.trim() || '';
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputNameInput?.value?.trim() || 'merged.csv';
+        const logFileName = logNameInput?.value?.trim() || 'merger-log.jsonl';
+
+        if (!inputDir) {
+          appendLog('csv-merger', 'Please select an input folder containing CSV files.', 'error');
+          return null;
+        }
+
+        return {
+          inputDir,
+          outputDir,
+          outputFileName,
+          logFileName,
         };
       }
 

@@ -1,6 +1,6 @@
 {
   "name": "koldify-toolkit-electron",
-  "version": "2.11.5",
+  "version": "3.0.0",
   "description": "Koldify Toolkit – Apify + Inhouse + Blitz Automation Desktop App",
   "main": "main.js",
   "author": "Koldify",
