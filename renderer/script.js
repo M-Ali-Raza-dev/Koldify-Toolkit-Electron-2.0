@@ -173,17 +173,6 @@
         set('reaction-unique-reactors', metrics.uniqueReactors);
         break;
 
-      case 'merge-split':
-        set('merge-files-found', metrics.filesFound);
-        set('merge-chunks-created', metrics.chunksCreated);
-        break;
-
-      case 'lead-merger':
-        set('lead-files-merged', metrics.filesMerged);
-        set('lead-total-leads', metrics.totalLeads);
-        set('lead-duplicates-removed', metrics.duplicatesRemoved);
-        break;
-
       case 'comment-scraper':
         set('comment-total-posts', metrics.totalPosts);
         set('comment-processed-posts', metrics.processedPosts);
@@ -306,7 +295,7 @@
       const activeTab =
         inhouseSidebar.querySelector('.nav-tab.active') ||
         inhouseSidebar.querySelector('.nav-tab[data-tool]');
-      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : 'merge-split';
+      activeToolId = activeTab ? activeTab.getAttribute('data-tool') : null;
     } else if (section === 'blitz' && blitzSidebar) {
       const activeTab =
         blitzSidebar.querySelector('.nav-tab.active') ||
@@ -594,30 +583,7 @@
         return { postsCsvPaths, keysFilePath, perKeyLimit, outputDir };
       }
 
-      case 'merge-split': {
-        const inputDirInput = inputs[0];
-        const outputDirInput = inputs[1];
-        const maxRowsInput = inputs[2];
-        const modeSelect = inputs[3];
-
-        const inputDir = inputDirInput?.value?.trim() || '';
-        const outputDir = outputDirInput?.value?.trim() || '';
-        const maxRowsPerChunk = Number(maxRowsInput?.value || 0) || 0;
-        const mode = modeSelect?.value || 'merge-split';
-
-        return { inputDir, outputDir, maxRowsPerChunk, mode };
-      }
-
-      case 'lead-merger': {
-        const inputDirInput = inputs[0];
-        const outputDirInput = inputs[1];
-
-        const checkboxes = card.querySelectorAll('.checkbox-row input[type="checkbox"]');
-        const dedupeByEmail = !!checkboxes[0]?.checked;
-        const normalizeHeaders = !!checkboxes[1]?.checked;
-
-        const inputDir = inputDirInput?.value?.trim() || '';
-        const outputDir = outputDirInput?.value?.trim() || '';
+      case 'apify-email-enricher': {
 
         return { inputDir, outputDir, dedupeByEmail, normalizeHeaders };
       }
@@ -1045,57 +1011,6 @@
           apiKey,
           region,
         };
-      }
-
-      // -------- INHOUSE --------
-      case 'merge-split': {
-        const inputDirInput = document.getElementById('inhouse-merge-input-dir');
-        const outputDirInput = document.getElementById('inhouse-merge-output-dir');
-        const chunkSizeInput = document.getElementById('inhouse-merge-chunk-size');
-        const modeSelect = document.getElementById('inhouse-merge-mode');
-
-        const inputDir = inputDirInput?.value?.trim() || '';
-        const outputDir = outputDirInput?.value?.trim() || '';
-        const chunkSize = Number(chunkSizeInput?.value || 5000) || 5000;
-        const mode = modeSelect?.value || 'merge-split';
-
-        if (!inputDir) {
-          alert('Please enter an input directory');
-          return null;
-        }
-        if (!outputDir) {
-          alert('Please enter an output directory');
-          return null;
-        }
-
-        return { inputDir, outputDir, chunkSize, mode };
-      }
-
-      case 'lead-merger': {
-        const inputDirInput = document.getElementById('inhouse-lead-input-dir');
-        const outputDirInput = document.getElementById('inhouse-lead-output-dir');
-        const outputFileInput = document.getElementById('inhouse-lead-output-file');
-
-        const inputDir = inputDirInput?.value?.trim() || '';
-        const outputDir = outputDirInput?.value?.trim() || '';
-        const outputFile = outputFileInput?.value?.trim() || 'merged.csv';
-        
-        // Get checkboxes separately
-        const dedupeCheckbox = document.getElementById('inhouse-lead-dedupe');
-        const normalizeCheckbox = document.getElementById('inhouse-lead-normalize');
-        const removeDuplicates = dedupeCheckbox?.checked !== false;
-        const normalizeHeaders = normalizeCheckbox?.checked !== false;
-
-        if (!inputDir) {
-          alert('Please enter an input directory');
-          return null;
-        }
-        if (!outputDir) {
-          alert('Please enter an output directory');
-          return null;
-        }
-
-        return { inputDir, outputDir, outputFile, removeDuplicates, normalizeHeaders };
       }
 
       default:

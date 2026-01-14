@@ -37,8 +37,8 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **LinkedIn Profile Enhancer** — enhance/enrich profile records
 
 ### Inhouse Tools (CSV utilities)
-- **Merge / Split CSV** — combine and split datasets cleanly
-- **Lead Merger** — merge lead files into one normalized output
+
+> New tools coming soon
 
 ### Blitz (enrichment)
 - **Email Enricher** — enrich emails via Blitz API
