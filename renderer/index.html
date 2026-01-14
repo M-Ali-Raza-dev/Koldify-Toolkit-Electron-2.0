@@ -123,6 +123,12 @@
             </svg>
             Waterfall ICP
           </button>
+          <button class="nav-tab" data-tool="reverse-phone">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Reverse Phone
+          </button>
         </nav>
       </aside>
 
@@ -1247,6 +1253,121 @@
                 </button>
               </div>
               <pre class="console" id="console-waterfall-icp">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reverse Phone -->
+        <div class="tool-card hidden" id="reverse-phone" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Reverse Phone Lookup</h3>
+                <span class="badge badge-blitz">Blitz</span>
+                <button class="help-icon" type="button" title="Find person details from phone numbers using Blitz API reverse phone lookup.">?</button>
+              </div>
+              <p>Enrich phone numbers with LinkedIn profile data and contact information</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">If left empty, app will use environment variable BLITZ_API_KEY</span>
+              </div>
+              <div class="form-field">
+                <label>Single Phone Number (optional)</label>
+                <input type="text" class="input-field" placeholder="+1234567890">
+                <span class="hint">Enter a single phone to test (leave blank if using CSV/TXT)</span>
+              </div>
+              <div class="form-field">
+                <label>Input File (CSV or TXT)</label>
+                <div class="input-with-button">
+                  <input id="reverse-phone-input-file" type="text" class="input-field" placeholder="Select CSV or TXT file" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="reverse-phone-input-file"
+                    data-filters='[["CSV/TXT Files", ["csv", "txt"]], ["All Files", ["*"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">CSV with phone column or TXT with one phone per line</span>
+              </div>
+              <div class="form-field">
+                <label>Phone Column (for CSV)</label>
+                <input type="text" class="input-field" placeholder="phone" value="phone">
+                <span class="hint">Column name containing phone numbers</span>
+              </div>
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input type="number" class="input-field" placeholder="3" value="3" min="1" max="10">
+                <span class="hint">Number of parallel requests (1-10)</span>
+              </div>
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="reverse-phone-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="reverse-phone-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="reverse-phone">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                Run Reverse Phone
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-reverse-phone"
+              >
+                Sample input
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total Phones:</span>
+                <strong data-metric="reverse-phone-total">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Processed:</span>
+                <strong data-metric="reverse-phone-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Found:</span>
+                <strong data-metric="reverse-phone-found">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Not Found:</span>
+                <strong data-metric="reverse-phone-not-found">0</strong>
+              </div>
+            </div>
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="reverse-phone"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-reverse-phone">Waiting for execution...</pre>
             </div>
           </div>
         </div>

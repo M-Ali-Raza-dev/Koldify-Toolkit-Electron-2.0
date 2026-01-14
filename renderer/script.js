@@ -227,6 +227,13 @@
         set('waterfall-no-matches', metrics.noMatches);
         break;
 
+      case 'reverse-phone':
+        set('reverse-phone-total', metrics.totalPhones);
+        set('reverse-phone-processed', metrics.phonesProcessed);
+        set('reverse-phone-found', metrics.phonesFound);
+        set('reverse-phone-not-found', metrics.phonesNotFound);
+        break;
+
       default:
         break;
     }
@@ -745,6 +752,42 @@
           outputDir,
           outputFile,
           streamAppend: true,
+        };
+      }
+
+      case 'reverse-phone': {
+        const apiKeyInput = inputs[0];
+        const singlePhoneInput = inputs[1];
+        const inputFileInput = inputs[2];
+        const columnNameInput = inputs[3];
+        const concurrencyInput = inputs[4];
+        const outputDirInput = inputs[5];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const singlePhone = singlePhoneInput?.value?.trim() || '';
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const columnName = columnNameInput?.value?.trim() || 'phone';
+        const concurrency = Number(concurrencyInput?.value || 3) || 3;
+        const outputDir = outputDirInput?.value?.trim() || '';
+
+        // Must have either single phone or input file
+        if (!singlePhone && !inputPath) {
+          alert('Please enter a phone number OR select an input file (CSV/TXT)');
+          return null;
+        }
+
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
+        return {
+          apiKey,
+          singlePhone,
+          inputPath,
+          columnName,
+          concurrency,
+          outputDir,
         };
       }
 
