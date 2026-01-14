@@ -164,7 +164,7 @@ const SINGLE_KEYWORD = getArg(
 );
 
 // CSV Header (fixed)
-const CSV_HEADER = ["post url", "author name", "reaction num"];
+const CSV_HEADER = ["Post Url", "Author Name", "Reaction Num"];
 
 /* ===================== HELPERS ===================== */
 function ensureDir(p) {
@@ -303,9 +303,9 @@ function normalizeItem(item) {
     "";
 
   return {
-    postUrl,
-    authorName,
-    reactionNum,
+    "Post Url": postUrl,
+    "Author Name": authorName,
+    "Reaction Num": reactionNum,
   };
 }
 
@@ -314,9 +314,9 @@ function dedupeByUrl(rows) {
   const seen = new Set();
   const out = [];
   for (const r of rows) {
-    if (!r.postUrl) continue;
-    if (seen.has(r.postUrl)) continue;
-    seen.add(r.postUrl);
+    if (!r["Post Url"]) continue;
+    if (seen.has(r["Post Url"])) continue;
+    seen.add(r["Post Url"]);
     out.push(r);
   }
   return out;
