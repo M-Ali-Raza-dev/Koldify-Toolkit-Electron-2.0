@@ -173,6 +173,13 @@
             </svg>
             Employee Finder
           </button>
+          <button class="nav-tab" data-tool="blitz-current-date">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Current Date/Time
+          </button>
         </nav>
       </aside>
 
@@ -2122,6 +2129,56 @@
                 </button>
               </div>
               <pre class="console" id="console-blitz-employee-finder">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blitz Current Date/Time Tool Card -->
+        <div class="tool-card hidden" id="blitz-current-date" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">🕒</div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Blitz Current Date & Time</h3>
+                <span class="badge badge-blitz">Blitz</span>
+              </div>
+              <p>Get current date & time for any timezone/region</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input id="current-date-api-key" type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">Leave blank to use BLITZ_API_KEY env var</span>
+              </div>
+
+              <div class="form-field">
+                <label>Timezone/Region</label>
+                <input id="current-date-region" type="text" class="input-field" placeholder="America/New_York" value="America/New_York">
+                <span class="hint">Examples: America/New_York, Asia/Karachi, Europe/London, UTC</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="blitz-current-date">
+                Get Current Date/Time
+              </button>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Result</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="blitz-current-date"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-blitz-current-date">Waiting for execution...</pre>
             </div>
           </div>
         </div>
