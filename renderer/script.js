@@ -978,6 +978,41 @@
         };
       }
 
+      case 'blitz-employee-finder': {
+        const apiKeyInput = inputs[0];
+        const inputFileInput = inputs[1];
+        const columnNameInput = inputs[2];
+        const concurrencyInput = inputs[3];
+        const outputDirInput = inputs[4];
+        const outputFileInput = inputs[5];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const columnName = columnNameInput?.value?.trim() || 'Company LinkedIn Url';
+        const concurrency = Number(concurrencyInput?.value || 3) || 3;
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputFileInput?.value?.trim() || '';
+
+        if (!inputPath) {
+          alert('Please select an input CSV file.');
+          return null;
+        }
+
+        if (!outputDir) {
+          alert('Please select an output folder.');
+          return null;
+        }
+
+        return {
+          apiKey,
+          inputPath,
+          columnName,
+          concurrency,
+          outputDir,
+          outputFileName,
+        };
+      }
+
       default:
         return {};
     }

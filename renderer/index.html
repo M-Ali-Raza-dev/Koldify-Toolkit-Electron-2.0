@@ -165,6 +165,14 @@
             </svg>
             Key Info
           </button>
+          <button class="nav-tab" data-tool="blitz-employee-finder">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="16" rx="2" ry="2"/>
+              <path d="M3 10h18"/>
+              <path d="M8 7h.01M12 7h.01M16 7h.01"/>
+            </svg>
+            Employee Finder
+          </button>
         </nav>
       </aside>
 
@@ -1999,6 +2007,102 @@
                 </button>
               </div>
               <pre class="console" id="console-blitz-key-info">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blitz Employee Finder Tool Card -->
+        <div class="tool-card hidden" id="blitz-employee-finder" data-section="blitz">
+          <div class="card-header">
+            <div class="card-icon">👥</div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>Blitz Employee Finder</h3>
+                <span class="badge badge-blitz">Blitz</span>
+              </div>
+              <p>Find employees from company LinkedIn URLs with filtering options</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Blitz API Key</label>
+                <input id="employee-finder-api-key" type="password" class="input-field" placeholder="blitz_************************">
+                <span class="hint">Leave blank to use BLITZ_API_KEY env var</span>
+              </div>
+
+              <div class="form-field">
+                <label>Input File (CSV)</label>
+                <div class="input-with-button">
+                  <input id="employee-finder-input-file" type="text" class="input-field" placeholder="Select CSV file" readonly>
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="employee-finder-input-file"
+                    data-filters='[["CSV Files", ["csv"]], ["All Files", ["*"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">CSV must include "Company LinkedIn Url" (or legacy company_linkedin_url). Optional filters: Country Code, Continent, Sales Region, Job Level, Job Function, Min Connections Count, Max Results, Page.</span>
+              </div>
+
+              <div class="form-field">
+                <label>Company URL Column</label>
+                <input id="employee-finder-column-name" type="text" class="input-field" placeholder="Company LinkedIn Url" value="Company LinkedIn Url">
+              </div>
+
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input id="employee-finder-concurrency" type="number" class="input-field" placeholder="3" value="3" min="1" max="10">
+                <span class="hint">Parallel requests (1-10)</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output folder</label>
+                <div class="input-with-button">
+                  <input id="employee-finder-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="employee-finder-output-dir"
+                  >Browse</button>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Output filename (optional)</label>
+                <input id="employee-finder-output-file" type="text" class="input-field" placeholder="employee_finder_results.csv">
+                <span class="hint">Leave blank for auto-generated timestamp filename</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="blitz-employee-finder">
+                Run Employee Finder
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="blitz-employee-finder"
+              >
+                Sample input
+              </button>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="blitz-employee-finder"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-blitz-employee-finder">Waiting for execution...</pre>
             </div>
           </div>
         </div>
