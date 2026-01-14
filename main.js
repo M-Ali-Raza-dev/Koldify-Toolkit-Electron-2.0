@@ -165,6 +165,14 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'linkedin-url-to-domain': {
+    script: unpackedPath('backend', 'blitz', 'blitz-linkedin-url-to-domain.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -189,6 +197,7 @@ const SAMPLE_DIRS = {
   'blitz-reverse-phone': path.join('samples', 'blitz', 'blitz-reverse-phone'),
   'blitz-reverse-email': path.join('samples', 'blitz', 'blitz-reverse-email'),
   'blitz-find-mobile-direct-phone': path.join('samples', 'blitz', 'blitz-find-mobile-direct-phone'),
+  'blitz-linkedin-url-to-domain': path.join('samples', 'blitz', 'blitz-linkedin-url-to-domain'),
 };
 
 // Recursively copy a directory (used for exporting samples)
