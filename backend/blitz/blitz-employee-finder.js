@@ -140,6 +140,12 @@ function jlog(level, msg, meta = {}) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), level, msg, ...meta }));
 }
 
+function emitState(payload) {
+  try {
+    console.log("::STATE:: " + JSON.stringify(payload));
+  } catch {}
+}
+
 /* =========================
  * CSV helpers
  * =======================*/
@@ -491,6 +497,14 @@ async function main() {
     output_dir: outputDir,
   });
 
+  emitState({
+    status: "start",
+    inputRows: rows.length,
+    outputRows: 0,
+    cleanRows: 0,
+    issueRows: 0,
+  });
+
   const outRows = [];
   let cursor = 0;
 
@@ -499,6 +513,7 @@ async function main() {
   let okCompanies = 0;
   let zeroCompanies = 0;
   let failCompanies = 0;
+  let issueRows = 0;
 
   async function worker(workerId) {
     while (true) {
@@ -521,6 +536,13 @@ async function main() {
         });
         if (done % 5 === 0 || done === rows.length) {
           UI.progress({ done, total: rows.length, okCompanies, zeroCompanies, failCompanies, outRows: outRows.length });
+          emitState({
+            status: "progress",
+            inputRows: rows.length,
+            outputRows: outRows.length,
+            cleanRows: outRows.length - issueRows,
+            issueRows: issueRows,
+          });
         }
         continue;
       }
@@ -543,6 +565,7 @@ async function main() {
             (res?.data?._raw ? String(res.data._raw).slice(0, 260) : "Request failed");
 
           outRows.push(flattenErrorRow(idx + 1, payload, res.status, msg));
+          issueRows++;
           failCompanies++;
           done++;
 
@@ -593,6 +616,7 @@ async function main() {
       } catch (e) {
         const msg = e?.message || String(e);
         outRows.push(flattenErrorRow(idx + 1, payload, "", msg));
+        issueRows++;
 
         failCompanies++;
         done++;
@@ -613,6 +637,13 @@ async function main() {
 
       if (done % 5 === 0 || done === rows.length) {
         UI.progress({ done, total: rows.length, okCompanies, zeroCompanies, failCompanies, outRows: outRows.length });
+        emitState({
+          status: "progress",
+          inputRows: rows.length,
+          outputRows: outRows.length,
+          cleanRows: outRows.length - issueRows,
+          issueRows: issueRows,
+        });
       }
     }
   }
@@ -660,8 +691,16 @@ async function main() {
 
   fs.writeFileSync(outPath, toCSV(headers, outRows), "utf8");
 
-  const okRows = outRows.filter((r) => !String(r["Error Message"] || "").trim()).length;
-  const errRows = outRows.filter((r) => String(r["Error Message"] || "").trim()).length;
+  const errRows = issueRows;
+  const okRows = outRows.length - errRows;
+
+  emitState({
+    status: "done",
+    inputRows: rows.length,
+    outputRows: outRows.length,
+    cleanRows: okRows,
+    issueRows: errRows,
+  });
 
   if (!JSON_ONLY) {
     UI.summary({
