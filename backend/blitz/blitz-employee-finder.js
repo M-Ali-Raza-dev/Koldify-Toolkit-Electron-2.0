@@ -1,8 +1,8 @@
 /**
- * Blitz Employee Finder (CSV -> CSV)
+ * Blitz Employee Finder (CSV -> CSV) — Pretty console (NO ANSI, Electron-safe)
  *
  * Supports:
- *  - CLI flags: --apiKey, --input, --output-dir, --output-file, --concurrency, --column
+ *  - CLI flags: --apiKey, --input, --output-dir, --output-file, --concurrency, --column, --verbose, --json
  *  - Electron TOOL_CONFIG via BLITZ_API_KEY and TOOL_CONFIG JSON
  *  - CSV input column: "Company LinkedIn Url" (preferred) or legacy "company_linkedin_url"
  *
@@ -20,31 +20,9 @@ if (module.paths && !module.paths.includes(path.join(appRoot, "node_modules"))) 
 
 const API_URL = "https://api.blitz-api.ai/v2/search/employee-finder";
 
-/* ========= Pretty Console ========= */
-const C = {
-  reset: "\x1b[0m",
-  dim: "\x1b[2m",
-  bold: "\x1b[1m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  cyan: "\x1b[36m",
-  gray: "\x1b[90m",
-};
-const hr = () =>
-  console.log(C.gray + "────────────────────────────────────────────────────────────" + C.reset);
-const pad = (n, w = 3) => {
-  const s = String(n);
-  return s.length >= w ? s : " ".repeat(w - s.length) + s;
-};
-const fmtMs = (ms) => (ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`);
-const banner = () => {
-  console.clear?.();
-  console.log(C.cyan + C.bold + "Blitz Employee Finder" + C.reset + " " + C.gray + "(CSV → CSV)" + C.reset);
-  hr();
-};
-
-/* ========= CLI + TOOL_CONFIG ========= */
+/* =========================
+ * CLI + TOOL_CONFIG
+ * =======================*/
 function hasFlag(flag) {
   return process.argv.includes(flag);
 }
@@ -62,12 +40,109 @@ try {
 } catch {
   envCfg = {};
 }
-
 function fromEnv(key, fallback) {
   return Object.prototype.hasOwnProperty.call(envCfg, key) ? envCfg[key] : fallback;
 }
 
-/* ========= CSV helpers ========= */
+const JSON_ONLY = hasFlag("--json") || process.env.JSON_LOGS === "1";
+const VERBOSE = hasFlag("--verbose") || process.env.VERBOSE === "1";
+
+/* =========================
+ * Pretty Console (NO ANSI)
+ * =======================*/
+const UI = {
+  width: 74,
+  line(char = "─") {
+    if (JSON_ONLY) return;
+    console.log(char.repeat(this.width));
+  },
+  title() {
+    if (JSON_ONLY) return;
+    console.log("");
+    console.log("🧑‍💼 Blitz Employee Finder  (CSV → CSV)");
+    this.line();
+  },
+  section(name) {
+    if (JSON_ONLY) return;
+    console.log("");
+    console.log("• " + name);
+    this.line();
+  },
+  info(msg) {
+    if (JSON_ONLY) return;
+    console.log("ℹ " + msg);
+  },
+  ok(msg) {
+    if (JSON_ONLY) return;
+    console.log("✓ " + msg);
+  },
+  warn(msg) {
+    if (JSON_ONLY) return;
+    console.log("⚠ " + msg);
+  },
+  err(msg) {
+    if (JSON_ONLY) return;
+    console.log("✖ " + msg);
+  },
+  // One clean line per row completion
+  rowDone({ i, total, url, page, max, ms, results, totalPages, status, note }) {
+    if (JSON_ONLY) return;
+
+    const pos = `[${String(i).padStart(3, " ")}/${String(total).padStart(3, " ")}]`;
+    const time = ms != null ? (ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`) : "?";
+    const head = `${pos} ${url}  (p=${page}, max=${max})`;
+
+    // shorten long URLs a bit (still recognizable)
+    const trimmed = head.length > 90 ? head.slice(0, 87) + "..." : head;
+
+    let tail = "";
+    if (status === "OK") {
+      tail = `✅ OK • results=${results} • pages=${totalPages ?? "?"} • ${time}`;
+      if (results === 0) tail = `🟡 OK (0 results) • pages=${totalPages ?? "?"} • ${time}`;
+    } else if (status === "FAIL") {
+      tail = `❌ FAIL (${note || "?"}) • ${time}`;
+    } else if (status === "SKIP") {
+      tail = `⚠ SKIP • ${note || ""}`.trim();
+    } else {
+      tail = `ℹ ${note || ""}`.trim();
+    }
+
+    console.log(trimmed);
+    console.log("   " + tail);
+
+    if (VERBOSE && note && status === "FAIL") {
+      console.log("   ↳ " + String(note).slice(0, 220));
+    }
+  },
+  progress({ done, total, okCompanies, zeroCompanies, failCompanies, outRows }) {
+    if (JSON_ONLY) return;
+    console.log(
+      `… Progress: ${done}/${total}  |  ok=${okCompanies}  |  zero=${zeroCompanies}  |  fail=${failCompanies}  |  out_rows=${outRows}`
+    );
+  },
+  summary({ inputRows, outRows, okRows, errRows, outPath }) {
+    if (JSON_ONLY) return;
+
+    this.section("Run Summary");
+    console.log(`✓ Input rows:     ${inputRows}`);
+    console.log(`✓ Output rows:    ${outRows}`);
+    console.log(`✓ Clean rows:     ${okRows}`);
+    console.log(`✓ Rows w/ issues: ${errRows}`);
+    console.log("");
+    console.log("Saved CSV:");
+    console.log(outPath);
+    this.line();
+  },
+};
+
+function jlog(level, msg, meta = {}) {
+  if (!JSON_ONLY && !VERBOSE) return;
+  console.log(JSON.stringify({ ts: new Date().toISOString(), level, msg, ...meta }));
+}
+
+/* =========================
+ * CSV helpers
+ * =======================*/
 function csvEscape(v) {
   const s = (v ?? "").toString();
   if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
@@ -125,7 +200,9 @@ function toCSV(headers, rows) {
   return lines.join("\n");
 }
 
-/* ========= Parsing cell values ========= */
+/* =========================
+ * Parsing cell values
+ * =======================*/
 function parseListCell(v) {
   const s = (v ?? "").toString().trim();
   if (!s) return undefined;
@@ -150,7 +227,9 @@ function parseNumberCell(v) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/* ========= Safe row getter (supports new + old headers) ========= */
+/* =========================
+ * Safe row getter (supports new + old headers)
+ * =======================*/
 function getRowVal(row, possibleKeys) {
   for (const k of possibleKeys) {
     if (row[k] !== undefined && String(row[k]).trim() !== "") return row[k];
@@ -158,7 +237,9 @@ function getRowVal(row, possibleKeys) {
   return "";
 }
 
-/* ========= Network + retries ========= */
+/* =========================
+ * Network + retries
+ * =======================*/
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -199,7 +280,9 @@ async function callEmployeeFinder(payload, apiKey, attempt = 1) {
   return { ok: true, status: res.status, duration_ms: ms, data };
 }
 
-/* ========= Flatten response rows ========= */
+/* =========================
+ * Flatten response rows
+ * =======================*/
 function pickExperience(p) {
   const exp = Array.isArray(p.experiences) && p.experiences.length ? p.experiences[0] : null;
   return exp || {};
@@ -308,10 +391,12 @@ function flattenNoResultsRow(inputRowIndex, searchPayload, apiResult) {
   };
 }
 
-/* ========= Build payload from CSV row ========= */
-function buildPayloadFromRow(row) {
+/* =========================
+ * Build payload from CSV row
+ * =======================*/
+function buildPayloadFromRow(row, columnName) {
   const payload = {
-    company_linkedin_url: String(getRowVal(row, ["Company LinkedIn Url", "company_linkedin_url"])).trim(),
+    company_linkedin_url: String(getRowVal(row, [columnName, "Company LinkedIn Url", "company_linkedin_url"])).trim(),
 
     country_code: parseListCell(getRowVal(row, ["Country Code", "country_code"])),
     continent: parseListCell(getRowVal(row, ["Continent", "continent"])),
@@ -334,80 +419,109 @@ function buildPayloadFromRow(row) {
   return payload;
 }
 
-/* ========= Main ========= */
+/* =========================
+ * Main
+ * =======================*/
 async function main() {
-  banner();
+  if (!JSON_ONLY) UI.title();
 
   const apiKey = process.env.BLITZ_API_KEY || getArg("--apiKey") || fromEnv("apiKey", "");
   const inputPath = getArg("--input", fromEnv("inputPath", "")) || "";
-  const outputDir = getArg("--output-dir", fromEnv("outputDir", "")) || path.dirname(inputPath || ".");
+  const outputDir =
+    getArg("--output-dir", fromEnv("outputDir", "")) || path.dirname(inputPath || ".");
   const outputFileName = getArg("--output-file", fromEnv("outputFileName", "")) || "";
   const columnName = getArg("--column", fromEnv("columnName", "Company LinkedIn Url")) || "Company LinkedIn Url";
-  const concurrency = Math.max(1, parseInt(getArg("--concurrency", fromEnv("concurrency", "3")), 10) || 3);
+  const concurrency = Math.max(
+    1,
+    parseInt(getArg("--concurrency", fromEnv("concurrency", "3")), 10) || 3
+  );
 
   if (!apiKey) {
-    console.log(C.red + C.bold + "Missing API key." + C.reset);
-    console.log(C.yellow + 'PowerShell:  $env:BLITZ_API_KEY="YOUR_KEY"' + C.reset);
-    console.log(C.gray + 'Or pass:     --apiKey "YOUR_KEY"' + C.reset);
+    if (JSON_ONLY) {
+      console.log(JSON.stringify({ ok: false, error: "Missing API key." }));
+    } else {
+      UI.err("Missing API key. Set BLITZ_API_KEY or pass --apiKey.");
+      UI.info('PowerShell:  $env:BLITZ_API_KEY="YOUR_KEY"');
+    }
     process.exit(1);
   }
 
   const resolvedInput = inputPath || fromEnv("INPUT_CSV", "");
   if (!resolvedInput) {
-    console.log(C.red + "Input CSV path is required (set --input or TOOL_CONFIG.inputPath)." + C.reset);
+    UI.err("Input CSV path is required (set --input or TOOL_CONFIG.inputPath).");
     process.exit(1);
   }
 
   const inPath = path.resolve(resolvedInput);
   if (!fs.existsSync(inPath)) {
-    console.log(C.red + `Input CSV not found:` + C.reset);
-    console.log(C.gray + inPath + C.reset);
+    UI.err("Input CSV not found:");
+    console.log(inPath);
     process.exit(1);
   }
 
   const raw = fs.readFileSync(inPath, "utf8");
   const parsed = parseCSV(raw);
 
-  const hasNew = parsed.headers.includes(columnName);
+  const hasNew = parsed.headers.includes(columnName) || parsed.headers.includes("Company LinkedIn Url");
   const hasOld = parsed.headers.includes("company_linkedin_url");
 
   if (!hasNew && !hasOld) {
-    console.log(
-      C.red + `Input CSV must include column: "${columnName}" (or legacy: company_linkedin_url)` + C.reset
-    );
-    console.log(C.gray + `Found headers: ${parsed.headers.join(", ")}` + C.reset);
+    UI.err(`Input CSV must include column "${columnName}" (or legacy: company_linkedin_url)`);
+    UI.info(`Found headers: ${parsed.headers.join(", ")}`);
     process.exit(1);
   }
 
   const rows = parsed.rows.filter((r) => {
-    const v = getRowVal(r, [columnName, "company_linkedin_url"]);
+    const v = getRowVal(r, [columnName, "Company LinkedIn Url", "company_linkedin_url"]);
     return String(v || "").trim().length > 0;
   });
 
-  console.log(C.green + `✔ Loaded ${rows.length} rows` + C.reset);
-  console.log(C.gray + `Input:  ${inPath}` + C.reset);
-  console.log(C.gray + `Output: ${outputDir || "."}` + C.reset);
-  console.log(C.gray + `Concurrency: ${concurrency}` + C.reset);
-  hr();
+  if (!JSON_ONLY) {
+    UI.ok(`Loaded ${rows.length} rows`);
+    UI.info(`Input:  ${inPath}`);
+    UI.info(`Output: ${path.resolve(outputDir || ".")}`);
+    UI.info(`Concurrency: ${concurrency}`);
+    UI.section("Processing");
+  }
+
+  jlog("info", "starting", {
+    total_rows: rows.length,
+    concurrency,
+    input: inPath,
+    output_dir: outputDir,
+  });
 
   const outRows = [];
   let cursor = 0;
 
+  // counters (per input row)
+  let done = 0;
+  let okCompanies = 0;
+  let zeroCompanies = 0;
+  let failCompanies = 0;
+
   async function worker(workerId) {
     while (true) {
-      const i = cursor++;
-      if (i >= rows.length) return;
+      const idx = cursor++;
+      if (idx >= rows.length) return;
 
-      const payload = buildPayloadFromRow(rows[i]);
-      const label = `${C.cyan}W${workerId}${C.reset}`;
-
-      process.stdout.write(
-        `${label} ${C.gray}[${pad(i + 1)}/${pad(rows.length)}]${C.reset} ${payload.company_linkedin_url} ` +
-          `${C.gray}(page=${payload.page}, max=${payload.max_results})${C.reset} ... `
-      );
+      const payload = buildPayloadFromRow(rows[idx], columnName);
 
       if (!payload.company_linkedin_url) {
-        console.log(C.yellow + "SKIP (missing URL)" + C.reset);
+        done++;
+        UI.rowDone({
+          i: idx + 1,
+          total: rows.length,
+          url: "(missing company_linkedin_url)",
+          page: payload.page ?? 1,
+          max: payload.max_results ?? 10,
+          ms: null,
+          status: "SKIP",
+          note: "missing URL",
+        });
+        if (done % 5 === 0 || done === rows.length) {
+          UI.progress({ done, total: rows.length, okCompanies, zeroCompanies, failCompanies, outRows: outRows.length });
+        }
         continue;
       }
 
@@ -416,7 +530,7 @@ async function main() {
         let attempts = 1;
 
         while (res.ok === "retry") {
-          process.stdout.write(`${C.yellow}retry(${res.status})${C.reset} `);
+          jlog("warn", "retrying", { workerId, row: idx + 1, status: res.status, attempt: attempts, backoff_ms: res.backoff });
           await sleep(res.backoff);
           attempts++;
           res = await callEmployeeFinder(payload, apiKey, attempts);
@@ -426,36 +540,79 @@ async function main() {
           const msg =
             res?.data?.message ||
             res?.data?.error ||
-            (res?.data?._raw ? String(res.data._raw).slice(0, 300) : "Request failed");
+            (res?.data?._raw ? String(res.data._raw).slice(0, 260) : "Request failed");
 
-          console.log(
-            C.red + `FAIL (${res.status})` + C.reset +
-              ` ${C.gray}${fmtMs(res.duration_ms)}${C.reset}` +
-              (msg ? ` ${C.yellow}${String(msg).slice(0, 120)}${C.reset}` : "")
-          );
+          outRows.push(flattenErrorRow(idx + 1, payload, res.status, msg));
+          failCompanies++;
+          done++;
 
-          outRows.push(flattenErrorRow(i + 1, payload, res.status, msg));
-          continue;
-        }
+          UI.rowDone({
+            i: idx + 1,
+            total: rows.length,
+            url: payload.company_linkedin_url,
+            page: payload.page,
+            max: payload.max_results,
+            ms: res.duration_ms,
+            status: "FAIL",
+            note: `${res.status}${msg ? " • " + String(msg).slice(0, 80) : ""}`,
+          });
 
-        const data = res.data || {};
-        const results = Array.isArray(data.results) ? data.results : [];
+          jlog("error", "request_failed", { workerId, row: idx + 1, status: res.status, duration_ms: res.duration_ms });
+        } else {
+          const data = res.data || {};
+          const results = Array.isArray(data.results) ? data.results : [];
 
-        console.log(
-          (results.length ? C.green + "OK" : C.yellow + "OK (0 results)") +
-            C.reset +
-            ` ${C.gray}${fmtMs(res.duration_ms)}${C.reset}` +
-            ` ${C.gray}(results=${results.length}, total_pages=${data.total_pages ?? "?"})${C.reset}`
-        );
+          if (results.length > 0) okCompanies++;
+          else zeroCompanies++;
 
-        for (const p of results) outRows.push(flattenEmployee(i + 1, payload, data, p));
+          for (const p of results) outRows.push(flattenEmployee(idx + 1, payload, data, p));
+          if (results.length === 0) outRows.push(flattenNoResultsRow(idx + 1, payload, data));
 
-        if (results.length === 0) {
-          outRows.push(flattenNoResultsRow(i + 1, payload, data));
+          done++;
+
+          UI.rowDone({
+            i: idx + 1,
+            total: rows.length,
+            url: payload.company_linkedin_url,
+            page: payload.page,
+            max: payload.max_results,
+            ms: res.duration_ms,
+            results: results.length,
+            totalPages: data.total_pages ?? "?",
+            status: "OK",
+          });
+
+          jlog("info", "request_ok", {
+            workerId,
+            row: idx + 1,
+            duration_ms: res.duration_ms,
+            results: results.length,
+            total_pages: data.total_pages ?? null,
+          });
         }
       } catch (e) {
-        console.log(C.red + "ERROR" + C.reset);
-        outRows.push(flattenErrorRow(i + 1, payload, "", e?.message || String(e)));
+        const msg = e?.message || String(e);
+        outRows.push(flattenErrorRow(idx + 1, payload, "", msg));
+
+        failCompanies++;
+        done++;
+
+        UI.rowDone({
+          i: idx + 1,
+          total: rows.length,
+          url: payload.company_linkedin_url,
+          page: payload.page,
+          max: payload.max_results,
+          ms: null,
+          status: "FAIL",
+          note: msg,
+        });
+
+        jlog("error", "exception", { workerId, row: idx + 1, error: msg });
+      }
+
+      if (done % 5 === 0 || done === rows.length) {
+        UI.progress({ done, total: rows.length, okCompanies, zeroCompanies, failCompanies, outRows: outRows.length });
       }
     }
   }
@@ -464,7 +621,7 @@ async function main() {
   for (let w = 1; w <= concurrency; w++) pool.push(worker(w));
   await Promise.all(pool);
 
-  hr();
+  if (!JSON_ONLY) UI.line();
 
   const headers = [
     "Input Row",
@@ -506,13 +663,23 @@ async function main() {
   const okRows = outRows.filter((r) => !String(r["Error Message"] || "").trim()).length;
   const errRows = outRows.filter((r) => String(r["Error Message"] || "").trim()).length;
 
-  console.log(C.green + C.bold + "DONE ✅" + C.reset);
-  console.log(C.gray + "Saved: " + C.reset + C.bold + outPath + C.reset);
-  console.log(
-    C.gray + "Rows: " + C.reset +
-      `ok=${C.green}${okRows}${C.reset}, issues=${C.yellow}${errRows}${C.reset}, total=${outRows.length}`
-  );
-  hr();
+  if (!JSON_ONLY) {
+    UI.summary({
+      inputRows: rows.length,
+      outRows: outRows.length,
+      okRows,
+      errRows,
+      outPath,
+    });
+  }
+
+  jlog("info", "done", {
+    output_file: outPath,
+    input_rows: rows.length,
+    output_rows: outRows.length,
+    ok_rows: okRows,
+    issue_rows: errRows,
+  });
 }
 
 main().catch((e) => {
