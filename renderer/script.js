@@ -248,6 +248,13 @@
         set('find-phone-not-found', metrics.phonesNotFound);
         break;
 
+      case 'linkedin-url-to-domain':
+        set('domain-total', metrics.totalUrls);
+        set('domain-processed', metrics.urlsProcessed);
+        set('domain-found', metrics.domainsFound);
+        set('domain-not-found', metrics.domainsNotFound);
+        break;
+
       default:
         break;
     }
@@ -871,6 +878,44 @@
         return {
           apiKey,
           singleLinkedin,
+          inputPath,
+          columnName,
+          concurrency,
+          outputDir,
+          outputFileName,
+        };
+      }
+
+      case 'linkedin-url-to-domain': {
+        const apiKeyInput = inputs[0];
+        const singleCompanyInput = inputs[1];
+        const inputFileInput = inputs[2];
+        const columnNameInput = inputs[3];
+        const concurrencyInput = inputs[4];
+        const outputDirInput = inputs[5];
+        const outputFileInput = inputs[6];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const singleCompany = singleCompanyInput?.value?.trim() || '';
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const columnName = columnNameInput?.value?.trim() || 'company_linkedin_url';
+        const concurrency = Number(concurrencyInput?.value || 6) || 6;
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputFileInput?.value?.trim() || '';
+
+        if (!singleCompany && !inputPath) {
+          alert('Please enter a company LinkedIn URL OR select an input file (CSV/TXT)');
+          return null;
+        }
+
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
+        return {
+          apiKey,
+          singleCompany,
           inputPath,
           columnName,
           concurrency,
