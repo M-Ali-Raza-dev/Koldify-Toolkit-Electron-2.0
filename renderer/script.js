@@ -707,40 +707,37 @@
       }
 
       case 'waterfall-icp': {
-        const apiKeyInput = inputs[0];
-        const companiesFileInput = inputs[1];
-        const includeTitlesInput = inputs[2];
-        const excludeTitlesInput = inputs[3];
-        const locationsInput = inputs[4];
-        const maxResultsInput = inputs[5];
-        const outputDirInput = inputs[6];
-        const outputFileInput = inputs[7];
+        const apiKey = document.getElementById('waterfall-api-key')?.value?.trim() || '';
 
-        const apiKey = apiKeyInput?.value?.trim() || '';
+        const companiesCsvPath =
+          document.getElementById('waterfall-companies-csv')?.value?.trim() || '';
+        const includeTitlesCsvPath =
+          document.getElementById('waterfall-include-titles-csv')?.value?.trim() || '';
+        const excludeTitlesCsvPath =
+          document.getElementById('waterfall-exclude-titles-csv')?.value?.trim() || '';
+        const locationsCsvPath =
+          document.getElementById('waterfall-locations-csv')?.value?.trim() || '';
 
-        let companiesCsvPath = '';
-        if (companiesFileInput?.files?.[0]) {
-          companiesCsvPath = companiesFileInput.files[0].path || '';
+        const maxResultsPerCompany =
+          Number(document.getElementById('waterfall-max-results')?.value || 10) || 10;
+
+        const outputDir =
+          document.getElementById('waterfall-output-dir')?.value?.trim() || '';
+        const outputFile =
+          document.getElementById('waterfall-output-file')?.value?.trim() || 'blitz_icp_results.csv';
+
+        if (!companiesCsvPath) {
+          alert('Please choose Companies CSV');
+          return null;
         }
-
-        let includeTitlesCsvPath = '';
-        if (includeTitlesInput?.files?.[0]) {
-          includeTitlesCsvPath = includeTitlesInput.files[0].path || '';
+        if (!includeTitlesCsvPath) {
+          alert('Please choose Include titles CSV');
+          return null;
         }
-
-        let excludeTitlesCsvPath = '';
-        if (excludeTitlesInput?.files?.[0]) {
-          excludeTitlesCsvPath = excludeTitlesInput.files[0].path || '';
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
         }
-
-        let locationsCsvPath = '';
-        if (locationsInput?.files?.[0]) {
-          locationsCsvPath = locationsInput.files[0].path || '';
-        }
-
-        const maxResultsPerCompany = Number(maxResultsInput?.value || 0) || 0;
-        const outputDir = outputDirInput?.value?.trim() || '';
-        const outputFile = outputFileInput?.value?.trim() || '';
 
         return {
           apiKey,
