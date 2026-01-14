@@ -32,6 +32,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Post Finder** — find LinkedIn posts by keyword and export results
 - **Reaction Scraper** — scrape reactors from post URLs (CSV in → CSV out)
 - **Comment Scraper** — orchestrated comment scraping + export
+- **Contact Details Scraper** — extract contact information from LinkedIn profiles
 - **Merge / Split CSV** — combine and split datasets cleanly
 - **Lead Merger** — merge lead files into one normalized output
 - **Email Enricher** — extract/enrich emails using Apify flows
@@ -41,6 +42,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Email Enricher** — enrich emails via Blitz API
 - **Waterfall ICP** — waterfall enrichment / ICP pipeline (status streaming supported)
 - **Reverse Email** — lookup person details from email addresses (single/batch, CSV/TXT support)
+- **Reverse Phone** — lookup person details from phone numbers (single/batch, CSV/TXT support)
 
 > The app streams logs and supports structured stdout formats like `::STATE:: {...}` for live status + metrics.
 
