@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v2.10.2</h1>
+  <h1>Koldify Toolkit (Electron) — v2.11.0</h1>
   <p><b>Apify + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-2.10.2-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-2.11.0-success">
   </p>
 </div>
 
@@ -49,6 +49,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Key Info** — check Blitz API key details, credits, rate limits, and allowed endpoints
 - **Employee Finder** — search employees by company LinkedIn URL with filters (region, level, function, connections)
   - New sample bundle: `samples/blitz/blitz-employee-finder/companies.csv`
+- **Current Date/Time** — get current date & time for any timezone/region
 
 > The app streams logs and supports structured stdout formats like `::STATE:: {...}` for live status + metrics.
 

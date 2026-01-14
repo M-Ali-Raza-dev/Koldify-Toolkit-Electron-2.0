@@ -196,6 +196,14 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'blitz-current-date': {
+    script: unpackedPath('backend', 'blitz', 'blitz-current-date.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================

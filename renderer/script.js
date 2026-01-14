@@ -1020,6 +1020,19 @@
         };
       }
 
+      case 'blitz-current-date': {
+        const apiKeyInput = inputs[0];
+        const regionInput = inputs[1];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const region = regionInput?.value?.trim() || 'America/New_York';
+
+        return {
+          apiKey,
+          region,
+        };
+      }
+
       default:
         return {};
     }
