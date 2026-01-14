@@ -234,6 +234,13 @@
         set('reverse-phone-not-found', metrics.phonesNotFound);
         break;
 
+      case 'reverse-email':
+        set('reverse-email-total', metrics.totalEmails);
+        set('reverse-email-processed', metrics.emailsProcessed);
+        set('reverse-email-found', metrics.emailsFound);
+        set('reverse-email-not-found', metrics.emailsNotFound);
+        break;
+
       default:
         break;
     }
@@ -785,6 +792,45 @@
           columnName,
           concurrency,
           outputDir,
+        };
+      }
+
+      case 'reverse-email': {
+        const apiKeyInput = inputs[0];
+        const singleEmailInput = inputs[1];
+        const inputFileInput = inputs[2];
+        const columnNameInput = inputs[3];
+        const concurrencyInput = inputs[4];
+        const outputDirInput = inputs[5];
+        const outputFileInput = inputs[6];
+
+        const apiKey = apiKeyInput?.value?.trim() || '';
+        const singleEmail = singleEmailInput?.value?.trim() || '';
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const columnName = columnNameInput?.value?.trim() || 'email';
+        const concurrency = Number(concurrencyInput?.value || 4) || 4;
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputFileInput?.value?.trim() || '';
+
+        // Must have either single email or input file
+        if (!singleEmail && !inputPath) {
+          alert('Please enter an email address OR select an input file (CSV/TXT)');
+          return null;
+        }
+
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
+        return {
+          apiKey,
+          singleEmail,
+          inputPath,
+          columnName,
+          concurrency,
+          outputDir,
+          outputFileName,
         };
       }
 

@@ -149,6 +149,14 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'reverse-email': {
+    script: unpackedPath('backend', 'blitz', 'blitz-reverse-email.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -171,6 +179,7 @@ const SAMPLE_DIRS = {
   'blitz-email-enricher': path.join('samples', 'blitz', 'blitz-email-enricher'),
   'blitz-waterfall-icp': path.join('samples', 'blitz', 'blitz-waterfall-icp'),
   'blitz-reverse-phone': path.join('samples', 'blitz', 'blitz-reverse-phone'),
+  'blitz-reverse-email': path.join('samples', 'blitz', 'blitz-reverse-email'),
 };
 
 // Recursively copy a directory (used for exporting samples)
