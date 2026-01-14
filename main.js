@@ -181,6 +181,13 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'blitz-key-info': {
+    script: unpackedPath('backend', 'blitz', 'blitz-key-info.js'),
+    buildEnv: (payload) => ({
+      BLITZ_API_KEY: payload.apiKey || process.env.BLITZ_API_KEY,
+    }),
+  },
 };
 
 // ================================
