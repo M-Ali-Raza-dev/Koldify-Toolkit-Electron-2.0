@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v2.11.4</h1>
+  <h1>Koldify Toolkit (Electron) — v2.11.5</h1>
   <p><b>Apify + Inhouse + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-2.11.4-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-2.11.5-success">
   </p>
 </div>
 
@@ -37,8 +37,8 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **LinkedIn Profile Enhancer** — enhance/enrich profile records
 
 ### Inhouse Tools (CSV utilities)
-- **Merge / Split CSV** — combine and split datasets cleanly
-- **Lead Merger** — merge lead files into one normalized output
+
+> New tools coming soon
 
 ### Blitz (enrichment)
 - **Email Enricher** — enrich emails via Blitz API
@@ -54,6 +54,19 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 - **Current Date/Time** — get current date & time for any timezone/region
 
 > The app streams logs and supports structured stdout formats like `::STATE:: {...}` for live status + metrics.
+
+---
+
+## 📦 Old Functions (Deprecated)
+
+The following tools were available in **v2.11.4** and earlier but have been removed in **v2.11.5**. If you need these functions, please use the v2.11.4 branch:
+
+### Removed Inhouse Tools
+
+- **Merge / Split CSV** *(v2.11.4 and earlier)* — combined multiple CSVs and split them into manageable chunks
+- **Lead Merger** *(v2.11.4 and earlier)* — merged lead CSV files with deduplication by email and header normalization
+
+These tools are being replaced with improved alternatives in upcoming releases. Check the [v2.11.4 branch](https://github.com/M-Ali-Raza-dev/Koldify-Toolkit-Electron/tree/release/2.11.3) or [releases page](https://github.com/M-Ali-Raza-dev/Koldify-Toolkit-Electron/releases) to access the old version.
 
 ---
 
