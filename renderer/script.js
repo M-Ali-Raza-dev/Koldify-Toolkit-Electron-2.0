@@ -260,6 +260,13 @@
         break;
 
       // INHOUSE
+      case 'csv-splitter': {
+        set('csv-splitter-total-rows', metrics['csv-splitter-total-rows']);
+        set('csv-splitter-parts', metrics['csv-splitter-parts']);
+        set('csv-splitter-output', metrics['csv-splitter-output']);
+        break;
+      }
+
       case 'csv-merger':
         set('csv-merger-files', metrics['csv-merger-files']);
         set('csv-merger-rows', metrics['csv-merger-rows']);
@@ -1021,6 +1028,32 @@
       }
 
       // -------- INHOUSE --------
+      case 'csv-splitter': {
+        const inputFileInput = document.getElementById('csv-splitter-input-file');
+        const rowsInput = document.getElementById('csv-splitter-rows');
+        const outputDirInput = document.getElementById('csv-splitter-output-dir');
+
+        const inputPath = inputFileInput?.value?.trim() || '';
+        const rowsPerFile = Number(rowsInput?.value || 0) || 0;
+        const outputDir = outputDirInput?.value?.trim() || '';
+
+        if (!inputPath) {
+          appendLog('csv-splitter', 'Please select an input CSV file.', 'error');
+          return null;
+        }
+
+        if (!rowsPerFile || rowsPerFile < 1) {
+          appendLog('csv-splitter', 'Rows per split must be a positive number.', 'error');
+          return null;
+        }
+
+        return {
+          inputPath,
+          rowsPerFile,
+          outputDir,
+        };
+      }
+
       case 'csv-merger': {
         const inputDirInput = document.getElementById('csv-merger-input-dir');
         const outputDirInput = document.getElementById('csv-merger-output-dir');
