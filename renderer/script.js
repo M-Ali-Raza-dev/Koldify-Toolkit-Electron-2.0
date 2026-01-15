@@ -273,6 +273,12 @@
         set('csv-merger-columns', metrics['csv-merger-columns']);
         break;
 
+      case 'csv-deduplicator':
+        set('dedupe-processed', metrics['dedupe-processed']);
+        set('dedupe-output-rows', metrics['dedupe-output-rows']);
+        set('dedupe-removed', metrics['dedupe-removed']);
+        break;
+
       default:
         break;
     }
@@ -433,6 +439,42 @@
       blitzInputFile.addEventListener('change', () => {
         if (blitzInputFile.value?.trim()) {
           loadBlitzHeaders();
+        }
+      });
+    }
+
+    // Dedupe column picker
+    const dedupeInput = document.getElementById('dedupe-input-file');
+    const dedupeSelect = document.getElementById('dedupe-column-select');
+    if (dedupeInput && dedupeSelect) {
+      dedupeInput.addEventListener('change', async () => {
+        const filePath = dedupeInput.value?.trim();
+        if (!filePath) {
+          dedupeSelect.innerHTML = '<option value="">Select a CSV file first</option>';
+          return;
+        }
+
+        try {
+          const { headers = [] } = await electronAPI.previewCsv(filePath, 1);
+          dedupeSelect.innerHTML = '';
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = headers.length ? 'Pick dedupe column' : 'No columns found';
+          dedupeSelect.appendChild(placeholder);
+
+          headers.forEach((h) => {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = h;
+            dedupeSelect.appendChild(opt);
+          });
+
+          // Auto-select Email if exists
+          const emailCol = headers.find((h) => h.toLowerCase().includes('email'));
+          if (emailCol) dedupeSelect.value = emailCol;
+        } catch (err) {
+          console.error('Failed to read CSV headers for dedupe:', err);
+          dedupeSelect.innerHTML = '<option value="">Error reading file</option>';
         }
       });
     }
@@ -1075,6 +1117,37 @@
           outputDir,
           outputFileName,
           logFileName,
+        };
+      }
+
+      case 'csv-deduplicator': {
+        const inputFileEl = document.getElementById('dedupe-input-file');
+        const columnSelect = document.getElementById('dedupe-column-select');
+        const keepModeSelect = document.getElementById('dedupe-keep-mode');
+        const outputDirInput = document.getElementById('dedupe-output-dir');
+        const outputNameInput = document.getElementById('dedupe-output-name');
+
+        const inputPath = inputFileEl?.value?.trim() || '';
+        const columnName = columnSelect?.value?.trim() || '';
+        const keepMode = keepModeSelect?.value?.trim() || 'first';
+        const outputDir = outputDirInput?.value?.trim() || '';
+        const outputFileName = outputNameInput?.value?.trim() || 'deduplicated.csv';
+
+        if (!inputPath) {
+          appendLog('csv-deduplicator', 'Please select an input CSV file.', 'error');
+          return null;
+        }
+        if (!columnName) {
+          appendLog('csv-deduplicator', 'Please select a column to deduplicate by.', 'error');
+          return null;
+        }
+
+        return {
+          inputPath,
+          columnName,
+          keepMode,
+          outputDir,
+          outputFileName,
         };
       }
 
