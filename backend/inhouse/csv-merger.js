@@ -184,44 +184,158 @@ function normalizeHeader(h) {
 }
 
 /**
- * Optional alias map:
- * (keeps merged output cleaner when different files use different spellings)
- * You can remove/add synonyms anytime.
+ * Comprehensive alias definitions:
+ * Maps canonical column names to their various spellings/variations.
+ * Keeps merged output cleaner when different files use different spellings.
  */
-const ALIASES = new Map([
-  ["email", "Email"],
-  ["email address", "Email"],
-  ["work email", "Email"],
+const ALIAS_DEFS = {
+  // ===== Person identity =====
+  "Full Name": [
+    "full name",
+    "name",
+    "person name",
+    "person_name",
+    "person_name_unanalyzed_downcase",
+    "person_name_unanalyzed",
+    "PersonName",
+    "personName",
+  ],
+  "First Name": [
+    "first name",
+    "firstname",
+    "FirstName",
+    "person_first_name_unanalyzed",
+    "person_first_name",
+    "person_first_name_unanalyzed_downcase",
+    "first",
+    "given name",
+    "given_name",
+  ],
+  "Last Name": [
+    "last name",
+    "lastname",
+    "LastName",
+    "person_last_name_unanalyzed",
+    "person_last_name",
+    "surname",
+    "family name",
+    "family_name",
+  ],
 
-  ["first name", "First Name"],
-  ["firstname", "First Name"],
-  ["last name", "Last Name"],
-  ["lastname", "Last Name"],
-  ["full name", "Full Name"],
-  ["name", "Full Name"],
+  // ===== Contact =====
+  Email: [
+    "email",
+    "email address",
+    "work email",
+    "work_email",
+    "person_email",
+    "person_email_analyzed",
+    "person_email_status_cd",
+    "person_extrapolated_email_confidence",
+    "email_status",
+    "emailstatus",
+  ],
+  Phone: [
+    "phone",
+    "phone number",
+    "phone_number",
+    "person_phone",
+    "person_sanitized_phone",
+    "sanitized_phone",
+    "mobile",
+    "telephone",
+  ],
+  "LinkedIn URL": [
+    "linkedin",
+    "linkedin url",
+    "person linkedin url",
+    "profile url",
+    "person_linkedin_url",
+    "PersonLinkedIn",
+    "personLinkedIn",
+    "linkedin_profile",
+    "linkedinprofile",
+  ],
 
-  ["company", "Company"],
-  ["company name", "Company"],
-  ["organization", "Company"],
+  // ===== Role / Work =====
+  "Job Title": [
+    "job title",
+    "title",
+    "JobTitle",
+    "person_title",
+    "person_title_normalized",
+    "primary_title_normalized_for_faceting",
+    "role",
+    "position",
+  ],
+  "Seniority": ["seniority", "person_seniority"],
+  "Department / Function": [
+    "function",
+    "functions",
+    "department",
+    "person_functions",
+    "person_detailed_function",
+  ],
 
-  ["domain", "Domain"],
-  ["company domain", "Domain"],
-  ["website", "Website"],
-  ["website url", "Website"],
-  ["company website", "Website"],
-  ["company url", "Website"],
+  // ===== Location =====
+  Location: [
+    "location",
+    "person_location_city",
+    "person_location_city_with_state_or_country",
+    "person_location_state",
+    "person_location_state_with_country",
+    "person_location_country",
+    "person_location_postal_code",
+    "person_location_geojson",
+    "city",
+    "state",
+    "country",
+  ],
+  "Company Location": ["CompanyLocation", "company location", "organization location", "hq", "headquarters"],
 
-  ["linkedin", "LinkedIn URL"],
-  ["linkedin url", "LinkedIn URL"],
-  ["person linkedin url", "LinkedIn URL"],
-  ["profile url", "LinkedIn URL"],
+  // ===== Company =====
+  Company: [
+    "company",
+    "company name",
+    "CompanyName",
+    "organization",
+    "sanitized_organization_name_unanalyzed",
+    "account_name",
+    "org",
+  ],
+  Domain: ["domain", "company domain", "website domain", "companydomain"],
+  Website: ["website", "website url", "company website", "company url", "CompanyWebsite"],
+  "Company LinkedIn": ["CompanyLinkedIn", "company linkedin", "company_linkedin", "organization linkedin"],
+  "Company Facebook": ["CompanyFacebook", "company facebook", "company_facebook", "facebook"],
 
-  ["phone", "Phone"],
-  ["phone number", "Phone"],
+  // ===== Company attributes =====
+  Industry: ["industry", "Industry"],
+  "Company Employees": ["employees", "employee count", "company employees", "Employees", "headcount"],
+  Keywords: ["keywords", "tags", "keyword", "Keywords"],
 
-  ["job title", "Job Title"],
-  ["title", "Job Title"],
-]);
+  // ===== Apollo IDs / URLs =====
+  "Apollo Person ID": ["ApolloPersonId", "apollo person id", "person id", "apollo_person_id"],
+  "Apollo Person URL": ["ApolloPersonUrl", "apollo person url", "person url", "apollo_person_url"],
+  "Apollo Account ID": ["ApolloAccountId", "apollo account id", "account id", "apollo_account_id"],
+  "Apollo Account URL": ["ApolloAccountUrl", "apollo account url", "account url", "apollo_account_url"],
+
+  // ===== Misc / system fields =====
+  "Job Start Date": ["job_start_date", "job start date", "start date"],
+  "Random": ["random"],
+  "Index": ["_index", "index"],
+  "Type": ["_type", "type"],
+  "ID": ["_id", "id"],
+  "Score": ["_score", "score"],
+};
+
+// Build reverse lookup map: normalized variant -> canonical name
+const ALIASES = new Map();
+for (const [canonical, variants] of Object.entries(ALIAS_DEFS)) {
+  for (const variant of variants) {
+    const normalized = normalizeHeader(variant);
+    ALIASES.set(normalized, canonical);
+  }
+}
 
 function canonicalHeader(originalHeader) {
   const n = normalizeHeader(originalHeader);
