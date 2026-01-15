@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v3.1.2</h1>
+  <h1>Koldify Toolkit (Electron) — v3.2.0</h1>
   <p><b>Apify + Inhouse + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-3.1.2-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-3.2.0-success">
   </p>
 </div>
 
@@ -39,6 +39,7 @@ Built for growth ops, lead-gen workflows, and LinkedIn data pipelines.
 ### Inhouse Tools (CSV utilities)
 - **CSV Splitter** — stream-split large CSVs into timestamped part files with custom row counts
 - **CSV Merger** — intelligently merge multiple CSV files with auto-detected column normalization (no duplicates)
+- **CSV Deduplicator** — remove duplicate rows from CSV files based on any column (keep first or last occurrence)
 
 ### Blitz (enrichment)
 - **Email Enricher** — enrich emails via Blitz API
@@ -167,11 +168,11 @@ This makes onboarding new users super fast.
 ├── backend/
 │   ├── apify/              # Apify scripts (mjs/js)
 │   ├── blitz/              # Blitz scripts (js)
-│   └── inhouse/            # In-house CSV utilities (splitter, merger)
+│   └── inhouse/            # In-house CSV utilities (splitter, merger, deduplicator)
 └── samples/                # Copy-to-user sample input templates
-  ├── apify/
-  ├── blitz/
-  └── inhouse/            # CSV Splitter & Merger sample inputs
+    ├── apify/
+    ├── blitz/
+    └── inhouse/            # CSV Splitter, Merger & Deduplicator sample inputs
 ```
 
 ---

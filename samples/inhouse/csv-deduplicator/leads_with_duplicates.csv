@@ -1,0 +1,31 @@
+First Name,Last Name,Email,Company,Job Title,LinkedIn URL
+John,Doe,john.doe@acme.com,Acme Corp,Sales Manager,https://linkedin.com/in/johndoe
+Jane,Smith,jane.smith@techco.com,TechCo,Marketing Director,https://linkedin.com/in/janesmith
+Bob,Johnson,bob.johnson@startup.io,StartupIO,CEO,https://linkedin.com/in/bobjohnson
+Alice,Lee,alice.lee@bigco.com,BigCo,Product Manager,https://linkedin.com/in/alicelee
+John,Doe,john.doe@acme.com,Acme Corp,VP Sales,https://linkedin.com/in/johndoe
+Mike,Chen,mike.chen@cloud.com,CloudCorp,Engineer,https://linkedin.com/in/mikechen
+Sara,Wilson,sara.wilson@design.co,DesignCo,Creative Director,https://linkedin.com/in/sarawilson
+Jane,Smith,jane.smith@techco.com,TechCo,VP Marketing,https://linkedin.com/in/janesmith
+Tom,Brown,tom.brown@finance.com,FinanceCorp,CFO,https://linkedin.com/in/tombrown
+Emma,Davis,emma.davis@retail.com,RetailPlus,Operations Manager,https://linkedin.com/in/emmadavis
+Alice,Lee,alice.lee@bigco.com,BigCo,Senior PM,https://linkedin.com/in/alicelee
+David,Miller,david.miller@media.com,MediaGroup,Editor,https://linkedin.com/in/davidmiller
+Lisa,Garcia,lisa.garcia@health.com,HealthTech,CTO,https://linkedin.com/in/lisagarcia
+Bob,Johnson,bob.johnson@startup.io,StartupIO,Founder & CEO,https://linkedin.com/in/bobjohnson
+Kevin,Martinez,kevin.martinez@edu.com,EduTech,Head of Sales,https://linkedin.com/in/kevinmartinez
+Rachel,Anderson,rachel.anderson@law.com,LegalFirm,Partner,https://linkedin.com/in/rachelanderson
+Mike,Chen,mike.chen@cloud.com,CloudCorp,Senior Engineer,https://linkedin.com/in/mikechen
+Chris,Taylor,,FreelancePro,Consultant,https://linkedin.com/in/christaylor
+Diana,Moore,diana.moore@auto.com,AutoIndustry,Sales Director,https://linkedin.com/in/dianamoore
+Alex,White,alex.white@travel.com,TravelCo,Marketing Manager,https://linkedin.com/in/alexwhite
+Lisa,Garcia,lisa.garcia@health.com,HealthTech,Chief Technology Officer,https://linkedin.com/in/lisagarcia
+Nina,Jackson,nina.jackson@fashion.com,FashionBrand,Brand Manager,https://linkedin.com/in/ninajackson
+Tom,Brown,tom.brown@finance.com,FinanceCorp,Chief Financial Officer,https://linkedin.com/in/tombrown
+Oscar,Lee,,SmallBiz,Owner,https://linkedin.com/in/oscarlee
+Emma,Davis,emma.davis@retail.com,RetailPlus,VP Operations,https://linkedin.com/in/emmadavis
+Paula,Harris,paula.harris@sports.com,SportsCo,Athlete Relations,https://linkedin.com/in/paulaharris
+David,Miller,david.miller@media.com,MediaGroup,Senior Editor,https://linkedin.com/in/davidmiller
+Quinn,Clark,quinn.clark@energy.com,EnergyCorp,Analyst,https://linkedin.com/in/quinnclark
+Sara,Wilson,sara.wilson@design.co,DesignCo,Chief Creative Officer,https://linkedin.com/in/sarawilson
+Rachel,Anderson,rachel.anderson@law.com,LegalFirm,Senior Partner,https://linkedin.com/in/rachelanderson

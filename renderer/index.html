@@ -192,6 +192,14 @@
             </svg>
             CSV Merger
           </button>
+          <button class="nav-tab" data-tool="csv-deduplicator">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 12h18M3 18h18"/>
+              <circle cx="7" cy="6" r="1" fill="currentColor"/>
+              <circle cx="7" cy="12" r="1" fill="currentColor"/>
+            </svg>
+            CSV Deduplicator
+          </button>
         </nav>
       </aside>
 
@@ -2203,6 +2211,127 @@
                 </button>
               </div>
               <pre class="console" id="console-csv-merger">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSV Deduplicator -->
+        <div class="tool-card hidden" id="csv-deduplicator" data-section="inhouse">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M3 12h18M3 18h18"/>
+                <circle cx="7" cy="6" r="1" fill="currentColor"/>
+                <circle cx="7" cy="12" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>CSV Deduplicator</h3>
+                <span class="badge badge-inhouse" style="background: rgba(124, 58, 237, 0.15); color: rgba(167, 139, 250, 0.95);">In-House</span>
+                <button class="help-icon" type="button" title="Remove duplicate rows from CSV based on a chosen column.">?</button>
+              </div>
+              <p>Remove duplicates by any column - keep first or last occurrence</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV file</label>
+                <div class="input-with-button">
+                  <input id="dedupe-input-file" type="text" class="input-field" placeholder="Select CSV to deduplicate">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="dedupe-input-file"
+                    data-filters='[["CSV Files",["csv"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">CSV file with duplicate rows</span>
+              </div>
+
+              <div class="form-field">
+                <label>Dedupe Column</label>
+                <select id="dedupe-column-select" class="input-field">
+                  <option value="">Select a CSV file first</option>
+                </select>
+                <span class="hint">Column to check for duplicates (e.g., Email, LinkedIn URL)</span>
+              </div>
+
+              <div class="form-field">
+                <label>Keep Mode</label>
+                <select id="dedupe-keep-mode" class="input-field">
+                  <option value="first">Keep First Occurrence</option>
+                  <option value="last">Keep Last Occurrence</option>
+                </select>
+                <span class="hint">Which duplicate to keep</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output folder (optional)</label>
+                <div class="input-with-button">
+                  <input id="dedupe-output-dir" type="text" class="input-field" placeholder="Defaults to input file's folder">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="dedupe-output-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">Where to save deduplicated file</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output filename</label>
+                <input id="dedupe-output-name" type="text" class="input-field" value="deduped.csv" placeholder="deduped.csv">
+                <span class="hint">Name for the deduplicated CSV</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="csv-deduplicator">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M3 12h18M3 18h18"/>
+                </svg>
+                Remove Duplicates
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="inhouse-csv-deduplicator"
+              >
+                Sample file
+              </button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Processed:</span>
+                <strong data-metric="dedupe-processed">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Output Rows:</span>
+                <strong data-metric="dedupe-output-rows">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Removed:</span>
+                <strong data-metric="dedupe-removed">0</strong>
+              </div>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="csv-deduplicator"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-csv-deduplicator">Waiting for execution...</pre>
             </div>
           </div>
         </div>

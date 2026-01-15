@@ -205,6 +205,13 @@ const toolRegistry = {
       TOOL_CONFIG: JSON.stringify(payload || {}),
     }),
   },
+
+  'csv-deduplicator': {
+    script: unpackedPath('backend', 'inhouse', 'csv-deduplicator.js'),
+    buildEnv: (payload) => ({
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
 };
 
 // ================================
@@ -234,6 +241,7 @@ const SAMPLE_DIRS = {
   // INHOUSE
   'inhouse-csv-merger': path.join('samples', 'inhouse', 'csv-merger'),
   'inhouse-csv-splitter': path.join('samples', 'inhouse', 'csv-splitter'),
+  'inhouse-csv-deduplicator': path.join('samples', 'inhouse', 'csv-deduplicator'),
 };
 
 // Recursively copy a directory (used for exporting samples)
