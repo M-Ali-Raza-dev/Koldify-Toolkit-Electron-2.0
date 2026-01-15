@@ -176,7 +176,15 @@
       <!-- Inhouse Tools Sidebar -->
       <aside class="sidebar" id="inhouse-sidebar">
         <nav class="sidebar-nav">
-          <button class="nav-tab active" data-tool="csv-merger">
+          <button class="nav-tab active" data-tool="csv-splitter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="16" rx="2" ry="2"/>
+              <path d="M3 10h18"/>
+              <path d="M9 7h.01M15 7h.01"/>
+            </svg>
+            CSV Splitter
+          </button>
+          <button class="nav-tab" data-tool="csv-merger">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
@@ -1992,8 +2000,112 @@
 
         <!-- INHOUSE TOOLS -->
 
+        <!-- CSV Splitter -->
+        <div class="tool-card" id="csv-splitter" data-section="inhouse">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2" ry="2"/>
+                <path d="M3 10h18"/>
+                <path d="M9 7h.01M15 7h.01"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>CSV Splitter</h3>
+                <span class="badge badge-inhouse" style="background: rgba(124, 58, 237, 0.15); color: rgba(167, 139, 250, 0.95);">In-House</span>
+                <button class="help-icon" type="button" title="Split large CSVs into smaller parts without loading entire files into memory.">?</button>
+              </div>
+              <p>Streaming splitter that writes timestamped output folders with evenly sized parts.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV file</label>
+                <div class="input-with-button">
+                  <input id="csv-splitter-input-file" type="text" class="input-field" placeholder="Select CSV to split">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-file"
+                    data-target="csv-splitter-input-file"
+                    data-filters='[["CSV Files",["csv"]]]'
+                  >Browse</button>
+                </div>
+                <span class="hint">Example: samples/inhouse/csv-splitter/leads.csv</span>
+              </div>
+
+              <div class="form-field">
+                <label>Rows per split</label>
+                <input id="csv-splitter-rows" type="number" class="input-field" value="500" min="1" placeholder="500">
+                <span class="hint">How many data rows per output CSV</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output folder (optional)</label>
+                <div class="input-with-button">
+                  <input id="csv-splitter-output-dir" type="text" class="input-field" placeholder="Defaults to the input file's folder">
+                  <button
+                    type="button"
+                    class="btn-ghost small"
+                    data-role="pick-dir"
+                    data-target="csv-splitter-output-dir"
+                  >Browse</button>
+                </div>
+                <span class="hint">A timestamped folder is created inside this path</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="csv-splitter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="16" rx="2" ry="2"/>
+                </svg>
+                Split CSV
+              </button>
+              <button
+                type="button"
+                class="btn-ghost small sample-btn"
+                data-sample-id="inhouse-csv-splitter"
+              >
+                Sample file
+              </button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total Rows:</span>
+                <strong data-metric="csv-splitter-total-rows">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Parts Created:</span>
+                <strong data-metric="csv-splitter-parts">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Output Folder:</span>
+                <strong data-metric="csv-splitter-output">n/a</strong>
+              </div>
+            </div>
+
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button
+                  type="button"
+                  class="btn-ghost small console-toggle"
+                  data-tool-id="csv-splitter"
+                >
+                  Expand Log
+                </button>
+              </div>
+              <pre class="console" id="console-csv-splitter">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
         <!-- CSV Merger -->
-        <div class="tool-card" id="csv-merger" data-section="inhouse">
+        <div class="tool-card hidden" id="csv-merger" data-section="inhouse">
           <div class="card-header">
             <div class="card-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
