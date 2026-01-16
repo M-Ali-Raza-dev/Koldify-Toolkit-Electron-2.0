@@ -333,7 +333,7 @@ async function main() {
         processed++;
 
         const ok = res.ok === true;
-        const found = results[i].found === "true";
+        const found = results[i]["Found"] === "true";
 
         if (ok) {
           if (found) foundTrue++;

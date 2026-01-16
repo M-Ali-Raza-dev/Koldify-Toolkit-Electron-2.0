@@ -1,13 +1,13 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v3.2.0</h1>
+  <h1>Koldify Toolkit (Electron) — v3.2.1</h1>
   <p><b>Apify + Inhouse + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-3.2.0-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-3.2.1-success">
   </p>
 </div>
 
