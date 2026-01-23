@@ -1,15 +1,30 @@
 
 <div align="center">
   <img src="renderer/assets/koldify-logo.svg" alt="Koldify Toolkit" width="120" />
-  <h1>Koldify Toolkit (Electron) — v3.2.1</h1>
+  <h1>Koldify Toolkit (Electron) — v3.3.0</h1>
   <p><b>Apify + Inhouse + Blitz automation suite</b> for LinkedIn data workflows, enrichment, and clean CSV outputs — with a single desktop UI.</p>
 
   <p>
     <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational">
     <img alt="Built With" src="https://img.shields.io/badge/built%20with-Electron-9cf">
-    <img alt="Version" src="https://img.shields.io/badge/version-3.2.1-success">
+    <img alt="Version" src="https://img.shields.io/badge/version-3.3.0-success">
   </p>
 </div>
+
+---
+
+## 📦 Release: 3.3.0
+
+Branch: `release/3.3.0`
+
+Description: InMail Checker integration + UI improvements
+
+- Added Apify “InMail Checker” tool with multi-key rotation and concurrency.
+- Consolidated live metrics in the status bar (total_linked, open, closed, skipped, error, done, keys, est. cost).
+- Fixed CSV header preview for file inputs (uses real file path, not fakepath).
+- Stabilized stdout filtering to avoid recursive writes.
+
+Upgrade notes: No breaking changes. Build as usual with `npm run build`.
 
 ---
 

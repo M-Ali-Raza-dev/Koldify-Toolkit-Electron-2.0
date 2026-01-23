@@ -109,6 +109,14 @@ const toolRegistry = {
     }),
   },
 
+  // New: InMail Checker (Apify actor BlJ6u6jb5UzYsyiKT)
+  'inmail-checker': {
+    script: unpackedPath('backend', 'apify', 'inmail-checker.js'),
+    buildEnv: (payload) => ({
+      TOOL_CONFIG: JSON.stringify(payload || {}),
+    }),
+  },
+
   // ---------- BLITZ TOOLS ----------
   'email-enricher': {
     script: unpackedPath('backend', 'blitz', 'blitz-email-enricher.js'),
@@ -227,6 +235,7 @@ const SAMPLE_DIRS = {
   'apify-email-extractor': path.join('samples', 'apify', 'email-extractor'),
   'linkedin-profile-enhancer': path.join('samples', 'apify', 'linkedin-profile-enhancer'),
   'apify-contact-details-scraper': path.join('samples', 'apify', 'contact-details-scraper'),
+  'apify-inmail-checker': path.join('samples', 'apify', 'inmail-checker'),
 
   // BLITZ
   'blitz-email-enricher': path.join('samples', 'blitz', 'blitz-email-enricher'),
