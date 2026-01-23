@@ -95,6 +95,12 @@
             </svg>
             Contact Details Scraper
           </button>
+          <button class="nav-tab" data-tool="inmail-checker">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 11h6m-3-3v6"/>
+            </svg>
+            InMail Checker
+          </button>
         </nav>
       </aside>
 
@@ -891,6 +897,116 @@
                 </button>
               </div>
               <pre class="console" id="console-linkedin-profile-enhancer">Waiting for execution...</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- InMail Checker -->
+        <div class="tool-card hidden" id="inmail-checker" data-section="apify">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 11h6m-3-3v6"/>
+              </svg>
+            </div>
+            <div class="card-title-wrap">
+              <div class="card-title-row">
+                <h3>InMail Checker</h3>
+                <span class="badge badge-apify">Apify</span>
+                <button class="help-icon" type="button" title="Check LinkedIn profiles for InMail eligibility using Apify Actor BlJ6u6jb5UzYsyiKT. Each key: 0.5-1k profiles, ~$5 max per key.">?</button>
+              </div>
+              <p>Batch check LinkedIn profiles for InMail eligibility with multi-key rotation</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Input CSV</label>
+                <input type="file" accept=".csv" class="input-field file-input" id="inmail-input-file">
+                <span class="hint">CSV with LinkedIn profile URLs</span>
+              </div>
+
+              <div class="form-field">
+                <label>LinkedIn URL Column</label>
+                <select class="input-field" id="inmail-linkedin-column">
+                  <option value="">Auto-detect</option>
+                </select>
+                <span class="hint">Select or leave auto-detect</span>
+              </div>
+
+              <div class="form-field">
+                <label>Apify Tokens (required)</label>
+                <textarea class="input-field" id="inmail-tokens" placeholder="Paste token or token1,token2,token3&#10;One per line or comma-separated" rows="3"></textarea>
+                <span class="hint">Multiple keys supported for rotation</span>
+              </div>
+
+              <div class="form-field">
+                <label>Concurrency</label>
+                <input type="number" class="input-field" id="inmail-concurrency" value="5" min="1" max="50">
+                <span class="hint">Parallel requests per key</span>
+              </div>
+
+              <div class="form-field">
+                <label>Output Folder</label>
+                <div class="input-with-button">
+                  <input id="inmail-output-dir" type="text" class="input-field" placeholder="./output">
+                  <button type="button" class="btn-ghost small" data-role="pick-dir" data-target="inmail-output-dir">Browse</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" data-role="run-tool" data-tool-id="inmail-checker">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                Start InMail Checker
+              </button>
+              <button type="button" class="btn-ghost small sample-btn" data-sample-id="apify-inmail-checker">Sample input</button>
+            </div>
+
+            <div class="status-bar">
+              <div class="status-pill">
+                <span>Total LinkedIn:</span>
+                <strong data-metric="inmail-total-linkedin">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Open:</span>
+                <strong data-metric="inmail-open-count">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Closed:</span>
+                <strong data-metric="inmail-closed-count">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Skipped:</span>
+                <strong data-metric="inmail-skipped-count">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Error:</span>
+                <strong data-metric="inmail-error-count">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Done:</span>
+                <strong data-metric="inmail-done-count">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Active Keys:</span>
+                <strong data-metric="inmail-active-keys">0</strong>
+              </div>
+              <div class="status-pill">
+                <span>Est. Cost:</span>
+                <strong data-metric="inmail-est-cost">$0</strong>
+              </div>
+            </div>
+
+            <!-- Run Log -->
+            <div class="console-wrap">
+              <div class="console-header-row">
+                <h4>Run Log</h4>
+                <button type="button" class="btn-ghost small console-toggle" data-tool-id="inmail-checker">Expand Log</button>
+              </div>
+              <pre class="console" id="console-inmail-checker">Waiting for execution...</pre>
             </div>
           </div>
         </div>

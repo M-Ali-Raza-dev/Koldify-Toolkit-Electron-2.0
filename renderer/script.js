@@ -202,6 +202,18 @@
         break;
       }
 
+      case 'inmail-checker': {
+        set('inmail-total-linkedin', metrics.totalLinkedIn || 0);
+        set('inmail-open-count', metrics.openCount || 0);
+        set('inmail-closed-count', metrics.closedCount || 0);
+        set('inmail-skipped-count', metrics.skippedCount || 0);
+        set('inmail-error-count', metrics.errorCount || 0);
+        set('inmail-done-count', metrics.doneCount || 0);
+        set('inmail-active-keys', metrics.activeKeys || 0);
+        set('inmail-est-cost', '$' + (metrics.estimatedCost || 0).toFixed(2));
+        break;
+      }
+
       // BLITZ
       case 'email-enricher':
         set('blitz-email-total-rows', metrics.totalRows);
@@ -480,6 +492,49 @@
     }
   }
 
+  function initInmailChecker() {
+    if (!electronAPI) return;
+
+    const inmailInputFile = document.getElementById('inmail-input-file');
+    const inmailLinkedinCol = document.getElementById('inmail-linkedin-column');
+
+    if (inmailInputFile && inmailLinkedinCol) {
+      inmailInputFile.addEventListener('change', async () => {
+        const filePath = inmailInputFile.files?.[0]?.path;
+        if (!filePath) {
+          inmailLinkedinCol.innerHTML = '<option value="">Auto-detect</option>';
+          return;
+        }
+
+        try {
+          const { headers = [] } = await electronAPI.previewCsv(filePath, 1);
+          inmailLinkedinCol.innerHTML = '';
+          
+          const autoOption = document.createElement('option');
+          autoOption.value = '';
+          autoOption.textContent = 'Auto-detect';
+          inmailLinkedinCol.appendChild(autoOption);
+
+          headers.forEach((h) => {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = h;
+            inmailLinkedinCol.appendChild(opt);
+          });
+
+          // Auto-select detected LinkedIn column
+          const detected = detectLinkedinColumn(headers);
+          if (detected) {
+            inmailLinkedinCol.value = detected;
+          }
+        } catch (err) {
+          console.error('Failed to read CSV headers for inmail:', err);
+          inmailLinkedinCol.innerHTML = '<option value="">Error reading file</option>';
+        }
+      });
+    }
+  }
+
   // ---------- SAMPLE INPUT BUTTONS ----------
   function initSampleButtons() {
     if (!electronAPI || !electronAPI.downloadSample) return;
@@ -639,9 +694,48 @@
         return { postsCsvPaths, keysFilePath, perKeyLimit, outputDir };
       }
 
-      case 'apify-email-enricher': {
+      case 'inmail-checker': {
+        const inputFileEl = document.getElementById('inmail-input-file');
+        const tokensEl = document.getElementById('inmail-tokens');
+        const linkedinColEl = document.getElementById('inmail-linkedin-column');
+        const concurrencyEl = document.getElementById('inmail-concurrency');
+        const outputDirEl = document.getElementById('inmail-output-dir');
 
-        return { inputDir, outputDir, dedupeByEmail, normalizeHeaders };
+        let inputCsvPath = '';
+        if (inputFileEl?.files?.[0]) {
+          inputCsvPath = inputFileEl.files[0].path || '';
+        }
+
+        const tokensInput = (tokensEl?.value || '').trim();
+        const tokens = tokensInput
+          .split(/[\n,]/)
+          .map(t => t.trim())
+          .filter(Boolean);
+
+        const linkedinColumn = linkedinColEl?.value?.trim() || '';
+        const concurrency = Number(concurrencyEl?.value || 5) || 5;
+        const outputDir = outputDirEl?.value?.trim() || '';
+
+        if (!inputCsvPath) {
+          alert('Please select an input CSV file');
+          return null;
+        }
+        if (!tokens.length) {
+          alert('Please enter at least one Apify token');
+          return null;
+        }
+        if (!outputDir) {
+          alert('Please select an output folder');
+          return null;
+        }
+
+        return {
+          inputCsv: inputCsvPath,
+          tokensStr: tokens.join(','),
+          linkedinColumn: linkedinColumn || undefined,
+          concurrency,
+          outputDir,
+        };
       }
 
       case 'comment-scraper': {
@@ -1217,6 +1311,18 @@
         console.log('[DEBUG] All validations passed!');
       }
 
+      if (toolId === 'inmail-checker') {
+        console.log('[DEBUG] Validating InMail Checker...');
+        console.log('[DEBUG] inputCsv:', payload?.inputCsv);
+        console.log('[DEBUG] tokens:', payload?.tokensStr ? 'provided' : 'missing');
+        console.log('[DEBUG] outputDir:', payload?.outputDir);
+
+        if (!payload?.inputCsv) throw new Error('Input CSV file is required.');
+        if (!payload?.tokensStr) throw new Error('At least one Apify token is required.');
+        if (!payload?.outputDir) throw new Error('Output folder is required.');
+        console.log('[DEBUG] All validations passed!');
+      }
+
       console.log('[DEBUG] Calling electronAPI.runTool with:', toolId, payload);
       const result = await electronAPI.runTool(toolId, payload);
       console.log('[DEBUG] Got result:', result);
@@ -1431,6 +1537,7 @@
     initDirPickers();
     initFilePickers();
     initBlitzPreview();
+    initInmailChecker();
     initSampleButtons();
     initPerToolConsoleToggles();
     initIpcListeners();
